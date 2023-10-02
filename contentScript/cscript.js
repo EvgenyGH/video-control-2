@@ -11,7 +11,9 @@ function main() {
             amediaExec();
             break;
         case "mangavost.org":
+            disableAd();
             mangavostExec();
+            playVideo();
             break;
     }
 }
@@ -80,6 +82,39 @@ function mangavostExec() {
 
 function setupVideoControls() {
 
+    // todo
 
+}
 
+async function disableAd() {
+    document.querySelector("#video_ad").remove();
+    console.log("INFO: AD disabled.");
+}
+
+async function playVideo() {
+    let autoplay = navigator.getAutoplayPolicy("mediaelement");
+    let video = document.querySelector("iframe + pjsdiv video");
+
+    if (["allowed-muted", "allowed"].includes(autoplay)) {
+        if (autoplay === "allowed-muted") {
+            video.volume = 0;
+            console.log("INFO: Autoplay video allowed muted.");
+        }
+
+        video.scrollIntoView();
+        video.play();
+
+        console.log("INFO: Video.play().");
+    } else {
+        console.log("INFO: Autoplay failed. Please change Autoplay policy.");
+    }
+}
+
+//Settigs pattern
+function Settings(prevEpisode, nexEpisode, startTime, endTime, delayTime) {
+    this.prevEpisode = prevEpisode;
+    this.nexEpisode = nexEpisode;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.delayTime = delayTime;
 }

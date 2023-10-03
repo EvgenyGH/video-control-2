@@ -51,3 +51,15 @@ div[id$="time_div"]:hover input[type="number"] {
 #warn_time {
     width: 3em;
 }
+
+
+
+
+
+video {
+    border: 1px dotted red;
+}
+
+body {
+    background-color: darkgray
+}

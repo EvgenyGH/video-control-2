@@ -1,0 +1,53 @@
+.controls_toolbar {
+    position: absolute;
+    right: 1%;
+    top: 1%;
+    font-size: 100%;
+    border: thick double #32a1ce;
+    border-radius: 15%;
+    color: Chartreuse;
+    box-sizing: border-box;
+    width: 65%;
+    padding: 0.5%;
+    display: grid;
+    grid: ". . .";
+    grid-auto-columns: 31%;
+    grid-column-gap: 3%;
+    grid-row-gap: 10%;
+}
+
+.controls_button {
+    position: relative;
+    border: 1px solid LightGoldenRodYellow;
+    border-radius: 15%;
+    text-align: center;
+}
+
+    .controls_button:hover {
+        background-color: rgba(201, 76, 76, 0.3);
+        font-weight: bold;
+    }
+
+input[type="number"] {
+    color: Chartreuse;
+    background-color: transparent;
+    border-style: none;
+    appearance: textfield;
+    font-size: 90%;
+    height: 1.5em;
+    box-sizing: border-box;
+}
+
+div[id$="time_div"]:hover input[type="number"] {
+    appearance: auto;
+    border: 1px dotted LightGoldenRodYellow;
+}
+
+#start_time,
+#end_time {
+    width: 4em;
+}
+
+#warn_time {
+    width: 3em;
+}

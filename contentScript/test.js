@@ -9,75 +9,73 @@ function createVideoControls() {
     controls = document.createElement("div");
     controls.className = "controls_toolbar";
 
-    buttons["startTime"] = document.createElement("div");
-    buttons["startTime"].id = "start_time_div";
+    buttons["start_time"] = createTimeElement("start_time", "Start time:");
+    //controls.append(buttons["start_time"]);
+    buttons["warn_time"] = createTimeElement("warn_time", "Warn time:");
+    //controls.append(buttons["warn_time"]);
+    buttons["end_time"] = createTimeElement("end_time", "End time:");
+    //controls.append(buttons["end_time"]);
 
-    label = document.createElement("label");
-    label.setAttribute('for', "start_data");
-    label.textContent = "Start time:";
-
-    timeNumbers["startTime"] = document.createElement("input");
-    timeNumbers["startTime"].setAttribute('id', 'start_time');
-
-    buttons["startTime"].append(label);
-    buttons["startTime"].append(timeNumbers["startTime"]);
-
-    buttons["warnTime"] = document.createElement("div");
-    buttons["warnTime"].id = "Warn_time_div";
-
-    label = document.createElement("label");
-    label.setAttribute('for', "warn_time");
-    label.textContent = "Warn time:";
-
-    timeNumbers["warnTime"] = document.createElement("input");
-    timeNumbers["warnTime"].setAttribute('id', 'warn_time');
-
-    buttons["warnTime"].append(label);
-    buttons["warnTime"].append(timeNumbers["warnTime"]);
-
-    buttons["endTime"] = document.createElement("div");
-    buttons["endTime"].id = "End_time_div";
-
-    label = document.createElement("label");
-    label.setAttribute('for', "end_time");
-    label.textContent = "End time:";
-
-    timeNumbers["endTime"] = document.createElement("input");
-    timeNumbers["endTime"].setAttribute('id', 'end_time');
-
-    buttons["endTime"].append(label);
-    buttons["endTime"].append(timeNumbers["endTime"]);
-
+    //here
     buttons["prevEpisode"] = document.createElement("div");
     buttons["prevEpisode"].textContent = "Previous episode";
     buttons["prevEpisode"].id = "Previous_episode";
+    buttons["prevEpisode"].className = "control_button";
 
     buttons["refresh"] = document.createElement("div");
     buttons["refresh"].textContent = "Refresh";
     buttons["refresh"].id = "Refresh";
+    buttons["refresh"].className = "control_button";
 
     buttons["nextEpisode"] = document.createElement("div");
     buttons["nextEpisode"].textContent = "Next episode";
     buttons["nextEpisode"].id = "Next_episode";
+    buttons["nextEpisode"].className = "control_button";
 
     Object.values(buttons).forEach(val => {
-        val.className = "controls_button";
         controls.append(val);
-    });
-
-    Object.values(timeNumbers).forEach(val => {
-        val.setAttribute('type', 'number');
-        val.setAttribute('min', '0');
-        val.setAttribute('value', '0');
     });
 
     document.querySelector("video").parentElement.append(controls);
 
     console.log(`INFO: Video controls created.`);
+}
 
-    //injectCSS();
+function createTimeElement(name, labelText) {
+    let timeElement = document.createElement("div");
+    timeElement.id = `${name}_container`;
+    timeElement.className = "time_container";
 
-   // console.log(`INFO: Video controls ready.`);
+    let label = document.createElement("label");
+    label.setAttribute('for', `${name}_data`);
+    label.textContent = labelText;
 
-    return [buttons, timeNumbers];
+    let inputElement = document.createElement("input");
+    inputElement.setAttribute('id', `${name}_data`);
+    inputElement.setAttribute('type', 'number');
+    inputElement.setAttribute('value', '0');
+
+    let setCurrentElement = document.createElement("div");
+    setCurrentElement.className = `set_current`;
+    setCurrentElement.textContent = "Set current";
+
+    let plusElement = document.createElement("div");
+    plusElement.className = `plus`;
+    plusElement.textContent = "+";
+
+    let minusElement = document.createElement("div");
+    minusElement.className = `minus`;
+    minusElement.textContent = "-";
+
+    timeElement.append(label);
+    timeElement.append(inputElement);
+    timeElement.append(setCurrentElement);
+    timeElement.append(plusElement);
+    timeElement.append(minusElement);
+
+    return timeElement;
+}
+
+function createNavElement() {
+
 }

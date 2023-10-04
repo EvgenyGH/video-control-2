@@ -1,31 +1,36 @@
 .controls_toolbar {
     position: absolute;
-    right: 1%;
-    top: 1%;
+    right: 2%;
+    top: 2%;
     font-size: 100%;
     border: thick double #32a1ce;
     border-radius: 15%;
     color: Chartreuse;
     box-sizing: border-box;
-    width: 65%;
+    width: 50vw;
     padding: 0.5%;
     display: grid;
     grid: ". . .";
-    grid-auto-columns: 31%;
-    grid-column-gap: 3%;
-    grid-row-gap: 10%;
+    grid-auto-columns: 32%;
+    justify-content: space-around;
+    grid-row-gap: 0.25em;
+    min-width: 32em;
 }
 
-.controls_button {
+.control_button,
+.time_container {
     position: relative;
     border: 1px solid LightGoldenRodYellow;
     border-radius: 15%;
     text-align: center;
+    line-height: 1.6;
 }
 
-    .controls_button:hover {
+    .control_button:hover,
+    .time_container:hover {
         background-color: rgba(201, 76, 76, 0.3);
         font-weight: bold;
+        #letter-spacing: 1.5px;
     }
 
 input[type="number"] {
@@ -38,19 +43,51 @@ input[type="number"] {
     box-sizing: border-box;
 }
 
-div[id$="time_div"]:hover input[type="number"] {
-    appearance: auto;
-    border: 1px dotted LightGoldenRodYellow;
-}
 
-#start_time,
-#end_time {
+
+#start_time_data,
+#end_time_data {
     width: 4em;
 }
 
-#warn_time {
+#warn_time_data {
     width: 3em;
 }
+
+.time_container {
+    display: grid;
+    grid: ". std std" ". . .";
+    justify-content: space-around;
+    padding: 4%;
+}
+
+#start_time_data,
+#warn_time_data,
+#end_time_data {
+    grid-area: std;
+}
+
+.plus,
+.minus,
+.set_current {
+    
+    
+}
+
+.plus,
+.minus {
+    border: dotted blue;
+    margin: auto 0;
+    width: 1.5em;
+}
+
+.set_current {
+    margin: auto;
+}
+
+
+
+
 
 
 

@@ -3,8 +3,6 @@
     right: 2%;
     top: 2%;
     font-size: 100%;
-    border: thick double #32a1ce;
-    border-radius: 15%;
     color: Chartreuse;
     box-sizing: border-box;
     width: 50vw;
@@ -14,13 +12,13 @@
     grid-auto-columns: 32%;
     justify-content: space-around;
     grid-row-gap: 0.25em;
-    min-width: 32em;
+    min-width: 33em;
 }
 
 .control_button,
 .time_container {
     position: relative;
-    border: 1px solid LightGoldenRodYellow;
+    border: 1px solid Chartreuse;
     border-radius: 15%;
     text-align: center;
     line-height: 1.6;
@@ -28,36 +26,26 @@
 
     .control_button:hover,
     .time_container:hover {
-        background-color: rgba(201, 76, 76, 0.3);
+        background-color: rgba(178, 34, 34, 0.2);
         font-weight: bold;
-        #letter-spacing: 1.5px;
     }
 
-input[type="number"] {
+.controls_toolbar input[type="number"] {
     color: Chartreuse;
     background-color: transparent;
-    border-style: none;
+    border: thin dotted Chartreuse;
     appearance: textfield;
     font-size: 90%;
     height: 1.5em;
     box-sizing: border-box;
-}
-
-
-
-#start_time_data,
-#end_time_data {
     width: 4em;
-}
-
-#warn_time_data {
-    width: 3em;
+    margin: auto;
 }
 
 .time_container {
     display: grid;
     grid: ". std std" ". . .";
-    justify-content: space-around;
+    justify-content: center;
     padding: 4%;
 }
 
@@ -67,36 +55,21 @@ input[type="number"] {
     grid-area: std;
 }
 
-.plus,
-.minus,
-.set_current {
-    
-    
+.plus:hover,
+.minus:hover,
+.set_current:hover,
+.controls_toolbar input:hover {
+    border: thin dotted DarkViolet;
 }
 
 .plus,
 .minus {
-    border: dotted blue;
-    margin: auto 0;
+    margin-left: 0.5em;
     width: 1.5em;
 }
 
+.plus,
+.minus,
 .set_current {
-    margin: auto;
-}
-
-
-
-
-
-
-
-
-
-video {
-    border: 1px dotted red;
-}
-
-body {
-    background-color: darkgray
+    border: thin dotted transparent;
 }

@@ -2,35 +2,18 @@ createVideoControls();
 
 function createVideoControls() {
     let buttons = {};
-    let timeNumbers = {};
-    let label;
     let controls;
 
     controls = document.createElement("div");
     controls.className = "controls_toolbar";
 
     buttons["start_time"] = createTimeElement("start_time", "Start time:");
-    //controls.append(buttons["start_time"]);
     buttons["warn_time"] = createTimeElement("warn_time", "Warn time:");
-    //controls.append(buttons["warn_time"]);
     buttons["end_time"] = createTimeElement("end_time", "End time:");
-    //controls.append(buttons["end_time"]);
 
-    //here
-    buttons["prevEpisode"] = document.createElement("div");
-    buttons["prevEpisode"].textContent = "Previous episode";
-    buttons["prevEpisode"].id = "Previous_episode";
-    buttons["prevEpisode"].className = "control_button";
-
-    buttons["refresh"] = document.createElement("div");
-    buttons["refresh"].textContent = "Refresh";
-    buttons["refresh"].id = "Refresh";
-    buttons["refresh"].className = "control_button";
-
-    buttons["nextEpisode"] = document.createElement("div");
-    buttons["nextEpisode"].textContent = "Next episode";
-    buttons["nextEpisode"].id = "Next_episode";
-    buttons["nextEpisode"].className = "control_button";
+    buttons["prevEpisode"] = createNavElement("previous_episode", "Previous episode");
+    buttons["refresh"] = createNavElement("refresh", "Refresh");
+    buttons["nextEpisode"] = createNavElement("next_episode", "Next episode");
 
     Object.values(buttons).forEach(val => {
         controls.append(val);
@@ -76,6 +59,12 @@ function createTimeElement(name, labelText) {
     return timeElement;
 }
 
-function createNavElement() {
+function createNavElement(id, text) {
+    let navElement = document.createElement("div");
 
+    navElement.textContent = text;
+    navElement.id = id;
+    navElement.className = "navigation_button";
+
+    return navElement;
 }

@@ -12,10 +12,10 @@
     grid-auto-columns: 32%;
     justify-content: space-around;
     grid-row-gap: 0.25em;
-    min-width: 33em;
+    min-width: 35em;
 }
 
-.control_button,
+.navigation_button,
 .time_container {
     position: relative;
     border: 1px solid Chartreuse;
@@ -24,9 +24,9 @@
     line-height: 1.6;
 }
 
-    .control_button:hover,
+    .navigation_button:hover,
     .time_container:hover {
-        background-color: rgba(178, 34, 34, 0.2);
+        background-color: rgba(178, 34, 34, 0.6);
         font-weight: bold;
     }
 
@@ -59,7 +59,7 @@
 .minus:hover,
 .set_current:hover,
 .controls_toolbar input:hover {
-    border: thin dotted DarkViolet;
+    border: thin dotted black;
 }
 
 .plus,

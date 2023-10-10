@@ -13,8 +13,7 @@
       "js": [ "contentScript/cscript.js" ],
       "match_about_blank": false,
       "all_frames": true,
-      "run_at": "document_idle",
-      "css": [ "contentScript/cstyle.css" ]
+      "run_at": "document_idle"
     }
   ],
   "incognito": "not_allowed"

@@ -111,8 +111,8 @@ async function playVideo() {
 
 function setupVideoControls() {
     createVideoControls();
-    //injectCSS();
-    //setupControlPanelListeners();
+    injectCSS();
+    setupControlPanelListeners();
 }
 
 function createVideoControls() {
@@ -184,19 +184,100 @@ function createNavElement(id, text) {
     return navElement;
 }
 
-/*//todo
 function injectCSS() {
-    let styleElement = document.createElement("link");
+    let style = document.createElement("style");
+    document.head.appendChild(style);
+    sheet = style.sheet;
 
-    styleElement.rel = "stylesheet";
-    styleElement.href = "cscript/cstyle.css";
+    sheet.insertRule(`
+        .controls_toolbar {
+            position: absolute;
+            right: 2%;
+            top: 2%;
+            font-size: 100%;
+            color: Chartreuse;
+            box-sizing: border-box;
+            width: 50vw;
+            padding: 0.5%;
+            display: grid;
+            grid: ". . .";
+            grid-auto-columns: 32%;
+            justify-content: space-around;
+            grid-row-gap: 0.25em;
+            min-width: 35em;
+        }`);
 
-    document.getElementsByTagName("head")[0].appendChild(styleElement);
+    sheet.insertRule(`
+        .navigation_button,
+        .time_container {
+            position: relative;
+            border: 1px solid Chartreuse;
+            border-radius: 15%;
+            text-align: center;
+            line-height: 1.6;
+        }`);
+
+    sheet.insertRule(`
+        .navigation_button:hover,
+        .time_container:hover {
+            background-color: rgba(178, 34, 34, 0.6);
+            font-weight: bold;
+        }`);
+
+    sheet.insertRule(`
+        .controls_toolbar input[type = "number"] {
+            color: Chartreuse;
+            background-color: transparent;
+            border: thin dotted Chartreuse;
+            appearance: textfield;
+            font-size: 90%;
+            height: 1.5em;
+            box-sizing: border-box;
+            width: 4em;
+            margin: auto;
+        }`);
+
+    sheet.insertRule(`
+        .time_container {
+            display: grid;
+            grid: ". std std" ". . .";
+            justify-content: center;
+            padding: 4%;
+        }`);
+
+    sheet.insertRule(`
+        #start_time_data,
+        #warn_time_data,
+        #end_time_data {
+            grid-area: std;
+        }`);
+
+    sheet.insertRule(`
+        .plus:hover,
+        .minus:hover,
+        .set_current:hover,
+        .controls_toolbar input[type = "number"]:hover {
+            border: thin dotted black;
+        }`);
+
+    sheet.insertRule(`
+        .plus,
+        .minus {
+            margin-left: 0.5em;
+            width: 1.5em;
+        }`);
+
+    sheet.insertRule(`
+        .plus,
+        .minus,
+        .set_current {
+            border: thin dotted transparent;
+        }`);
 
     console.log("INFO: Video controls style injected.");
 }
-*/
-async function setupControlPanelListeners(data) {
+
+function setupControlPanelListeners(data) {
     //setup video events
 
     return timeNumbers;

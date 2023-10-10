@@ -1,2 +1,3 @@
-# video-control-2
-Site video control (Anime)
+# Video-control
+## Video control for anime site https://amedia.online
+### under developing

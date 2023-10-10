@@ -1,6 +1,6 @@
 .vs
 renewZip.bat
 plugin.zip
-contentScript\cstyle.css
-contentScript\test.js
-contentScript\index.html
+/contentScript/test.js
+/contentScript/index.html
+/contentScript/cstyle.css

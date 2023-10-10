@@ -2,5 +2,5 @@
 renewZip.bat
 plugin.zip
 /contentScript/test.js
-/contentScript/index.html
-/contentScript/cstyle.css
+#/contentScript/index.html
+#/contentScript/cstyle.css

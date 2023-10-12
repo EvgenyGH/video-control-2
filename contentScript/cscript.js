@@ -88,7 +88,7 @@ function setupMessageExchange() {
 
             setTitle(settings.name);
             checkRefresh(settings);
-            setupControlPanelListeners(settings);
+            setupControlPanelListeners();
 
             console.log(`INFO: Control panel listeners set.`);
         }
@@ -294,7 +294,7 @@ function injectCSS() {
 }
 
 //toolbar listener set in setupVideoControls (not redifined)
-function setupControlPanelListeners(settings) {
+function setupControlPanelListeners() {
     setupRefreshEpisodeListener();
     setupPreviousEpisodeListener();
     setupNextEpisodeListener();

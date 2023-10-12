@@ -1,6 +1,4 @@
-﻿let videoData;
-
-main();
+﻿main();
 
 function main() {
     const title = /https:\/\/(?<title>.*?)\/.*?/.exec(window.location).groups["title"];
@@ -11,9 +9,7 @@ function main() {
             amediaExec();
             break;
         case "mangavost.org":
-            disableAd();
             mangavostExec();
-            playVideo();
             break;
     }
 }
@@ -71,10 +67,28 @@ function mangavostExec() {
 
 function setupMessageExchange() {
     window.addEventListener("message", (msg) => {
-        if (msg.origin.startsWith("https://amedia.online") && msg.data.request === "post_video_data") {
+        if (msg.origin.startsWith("https://amedia.online") &&
+            msg.data.request === "post_video_data" &&
+            msg.data?.name !== undefined) {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
-            videoData = msg.data;
-            console.log(`INFO: Data saved. Data <${JSON.stringify(videoData)}>.`);
+
+            let settings = localStorage.getItem(msg.data.name) ?? new Settings(null, null, 0, 0, 5, false);
+
+            settings.prevEpisode = msg.data.previousEpisode;
+            settings.nexEpisode = msg.data.nextEpisode;
+            settings.name = msg.data.name;
+
+            localStorage.setItem(settings.name, settings);
+
+            console.log(`INFO: Data saved. Data <${JSON.stringify(msg.data)}>.`);
+
+            setTitle(settings.name);
+
+            checkRefresh(settings);
+
+            setupControlPanelListeners(settings);
+
+            console.log(`INFO: Control panel listeners set.`);
         }
     });
 
@@ -112,7 +126,7 @@ async function playVideo() {
 function setupVideoControls() {
     createVideoControls();
     injectCSS();
-    setupControlPanelListeners();
+    setupToolbarListener();
 }
 
 function createVideoControls() {
@@ -277,18 +291,126 @@ function injectCSS() {
     console.log("INFO: Video controls style injected.");
 }
 
-function setupControlPanelListeners(data) {
-    //setup video events
+//toolbar listener set in setupVideoControls (not redifined)
+function setupControlPanelListeners(settings) {
+    setupRefreshEpisodeListener();
+    setupPreviousEpisodeListener();
+    setupNextEpisodeListener();
+    
+    setupEpisodeStartTimeListeners();
+    setupEpisodeEndTimeListeners();
+    setupEpisodeWarnTimeListeners();
 
-    return timeNumbers;
+    console.log("INFO: All video toolbar listeners set.");
+}
+
+function setTitle(name) {
+    document.querySelector(".controls_toolbar")
+        .setAttribute("title", name);
+}
+
+function setupToolbarListeners() {
+    document.querySelector(".controls_toolbar")
+        .addEventListener("click", e =>
+            e.stopPropagation()
+    );
+
+    console.log("INFO: Controls toolbar listener set.");
+}
+
+function checkRefresh(settings) {
+    if (settings.refresh) {
+        settings.refresh = false;
+        localStorage.setItem(settings.name, settings);
+
+        console.log(`INFO: Settings saved.`);
+
+        if (settings.nexEpisode !== null) {
+            console.log(`INFO: Opening url=<${settings.nexEpisode}>.`);
+            window.open(settings.nexEpisode, "_top");
+        } else {
+            console.log(`INFO: No next Episode.`);
+        }  
+    }
+}
+
+function setupRefreshEpisodeListener() {
+    document.querySelector("#refresh")
+        .addEventListener("click", e => {
+            let name = document.querySelector(".controls_toolbar").title;
+            let settings = localStorage.getItem(name);
+
+            settings.refresh = true;
+            localStorage.setItem(name, settings);
+
+            console.log(`INFO: Settings saved.`);
+
+            if (settings.prevEpisode !== null) {
+                console.log(`Opening url=<${settings.prevEpisode}>.`);
+
+                window.open(settings.prevEpisode, "_top");
+            } else {
+                console.log(`INFO: No previous episode.`);
+            }
+        });
+}
+
+function setupPreviousEpisodeListener() {
+    document.querySelector("#previous_episode")
+        .addEventListener("click", e => {
+            let name = document.querySelector(".controls_toolbar").title;
+            let settings = localStorage.getItem(name);
+
+            console.log(`INFO: Settings recieved for <${name}>.`);
+
+            if (settings.prevEpisode !== null) {
+                console.log(`Opening url=<${settings.prevEpisode}>.`);
+
+                window.open(settings.prevEpisode, "_top");
+            } else {
+                console.log(`INFO: No previous episode.`);
+            }
+        });
+}
+
+function setupNextEpisodeListener() {
+    document.querySelector("#next_episode")
+        .addEventListener("click", e => {
+            let name = document.querySelector(".controls_toolbar").title;
+            let settings = localStorage.getItem(name);
+
+            console.log(`INFO: Settings recieved for <${name}>.`);
+
+            if (settings.nextEpisode !== null) {
+                console.log(`Opening url=<${settings.nextEpisode}>.`);
+
+                window.open(settings.nextEpisode, "_top");
+            } else {
+                console.log(`INFO: No next episode.`);
+            }
+        });
+}
+
+function setupEpisodeStartTimeListeners() {
+
+}
+
+function setupEpisodeEndTimeListeners() {
+
+}
+
+function setupEpisodeWarnTimeListeners() {
+
 }
 
 
 //Settigs pattern
-function Settings(prevEpisode, nexEpisode, startTime, endTime, delayTime) {
+function Settings(name, prevEpisode, nexEpisode, startTime, endTime, delayTime, refresh) {
+    this.name = name;
     this.prevEpisode = prevEpisode;
     this.nexEpisode = nexEpisode;
     this.startTime = startTime;
     this.endTime = endTime;
     this.delayTime = delayTime;
+    this.refresh = refresh;
 }

@@ -70,22 +70,24 @@ function setupMessageExchange() {
         if (msg.origin.startsWith("https://amedia.online") &&
             msg.data.request === "post_video_data" &&
             msg.data?.name !== undefined) {
-            console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
+            console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
 
-            let settings = localStorage.getItem(msg.data.name) ?? new Settings(null, null, 0, 0, 5, false);
+            let settings = localStorage.getItem(msg.data.name);
+
+            if (settings === null) {
+                settings = new Settings(msg.data.name, null, null, 0, 0, 5, false);
+            } else {
+                settings = JSON.parse(settings);
+            }
 
             settings.prevEpisode = msg.data.previousEpisode;
-            settings.nexEpisode = msg.data.nextEpisode;
-            settings.name = msg.data.name;
+            settings.nextEpisode = msg.data.nextEpisode;
+            localStorage.setItem(settings.name, JSON.stringify(settings));
 
-            localStorage.setItem(settings.name, settings);
-
-            console.log(`INFO: Data saved. Data <${JSON.stringify(msg.data)}>.`);
+            console.log(`INFO: Data saved. Data <${JSON.stringify(settings)}>.`);
 
             setTitle(settings.name);
-
             checkRefresh(settings);
-
             setupControlPanelListeners(settings);
 
             console.log(`INFO: Control panel listeners set.`);
@@ -126,7 +128,7 @@ async function playVideo() {
 function setupVideoControls() {
     createVideoControls();
     injectCSS();
-    setupToolbarListener();
+    setupToolbarListeners();
 }
 
 function createVideoControls() {
@@ -296,7 +298,7 @@ function setupControlPanelListeners(settings) {
     setupRefreshEpisodeListener();
     setupPreviousEpisodeListener();
     setupNextEpisodeListener();
-    
+
     setupEpisodeStartTimeListeners();
     setupEpisodeEndTimeListeners();
     setupEpisodeWarnTimeListeners();
@@ -313,7 +315,7 @@ function setupToolbarListeners() {
     document.querySelector(".controls_toolbar")
         .addEventListener("click", e =>
             e.stopPropagation()
-    );
+        );
 
     console.log("INFO: Controls toolbar listener set.");
 }
@@ -321,16 +323,16 @@ function setupToolbarListeners() {
 function checkRefresh(settings) {
     if (settings.refresh) {
         settings.refresh = false;
-        localStorage.setItem(settings.name, settings);
+        localStorage.setItem(settings.name, JSON.stringify(settings));
 
         console.log(`INFO: Settings saved.`);
 
-        if (settings.nexEpisode !== null) {
-            console.log(`INFO: Opening url=<${settings.nexEpisode}>.`);
-            window.open(settings.nexEpisode, "_top");
+        if (settings.nextEpisode !== null) {
+            console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
+            window.open(settings.nextEpisode, "_top");
         } else {
             console.log(`INFO: No next Episode.`);
-        }  
+        }
     }
 }
 
@@ -338,10 +340,10 @@ function setupRefreshEpisodeListener() {
     document.querySelector("#refresh")
         .addEventListener("click", e => {
             let name = document.querySelector(".controls_toolbar").title;
-            let settings = localStorage.getItem(name);
+            let settings = JSON.parse(localStorage.getItem(name));
 
             settings.refresh = true;
-            localStorage.setItem(name, settings);
+            localStorage.setItem(name, JSON.stringify(settings));
 
             console.log(`INFO: Settings saved.`);
 
@@ -351,6 +353,10 @@ function setupRefreshEpisodeListener() {
                 window.open(settings.prevEpisode, "_top");
             } else {
                 console.log(`INFO: No previous episode.`);
+
+                let element = document.querySelector("#refresh");
+                setTimeout(title => element.textContent = title, 2000, element.textContent);
+                element.textContent = "IT`S FIRST EPISODE";
             }
         });
 }
@@ -359,7 +365,7 @@ function setupPreviousEpisodeListener() {
     document.querySelector("#previous_episode")
         .addEventListener("click", e => {
             let name = document.querySelector(".controls_toolbar").title;
-            let settings = localStorage.getItem(name);
+            let settings = JSON.parse(localStorage.getItem(name));
 
             console.log(`INFO: Settings recieved for <${name}>.`);
 
@@ -369,6 +375,10 @@ function setupPreviousEpisodeListener() {
                 window.open(settings.prevEpisode, "_top");
             } else {
                 console.log(`INFO: No previous episode.`);
+
+                let element = document.querySelector("#previous_episode");
+                setTimeout(title => element.textContent = title, 2000, element.textContent);
+                element.textContent = "NO EPISODE";
             }
         });
 }
@@ -377,7 +387,7 @@ function setupNextEpisodeListener() {
     document.querySelector("#next_episode")
         .addEventListener("click", e => {
             let name = document.querySelector(".controls_toolbar").title;
-            let settings = localStorage.getItem(name);
+            let settings = JSON.parse(localStorage.getItem(name));
 
             console.log(`INFO: Settings recieved for <${name}>.`);
 
@@ -387,6 +397,9 @@ function setupNextEpisodeListener() {
                 window.open(settings.nextEpisode, "_top");
             } else {
                 console.log(`INFO: No next episode.`);
+                let element = document.querySelector("#next_episode");
+                setTimeout(title => element.textContent = title, 2000, element.textContent);
+                element.textContent = "NO EPISODE";
             }
         });
 }
@@ -405,10 +418,10 @@ function setupEpisodeWarnTimeListeners() {
 
 
 //Settigs pattern
-function Settings(name, prevEpisode, nexEpisode, startTime, endTime, delayTime, refresh) {
+function Settings(name, prevEpisode, nextEpisode, startTime, endTime, delayTime, refresh) {
     this.name = name;
     this.prevEpisode = prevEpisode;
-    this.nexEpisode = nexEpisode;
+    this.nextEpisode = nextEpisode;
     this.startTime = startTime;
     this.endTime = endTime;
     this.delayTime = delayTime;

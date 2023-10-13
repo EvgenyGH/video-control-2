@@ -296,9 +296,9 @@ function setupControlPanelListeners() {
     setupPreviousEpisodeListener();
     setupNextEpisodeListener();
 
-    setupEpisodeStartTimeListeners();
-    setupEpisodeEndTimeListeners();
-    setupEpisodeWarnTimeListeners();
+    setupEpisodeTimeListeners("start");
+    setupEpisodeTimeListeners("warn");
+    setupEpisodeTimeListeners("end");
 
     console.log("INFO: All video toolbar listeners set.");
 }
@@ -395,61 +395,53 @@ function setupNextEpisodeListener() {
     console.log("INFO: Next episode listener set.");
 }
 
-function setupEpisodeStartTimeListeners() {
-    let startTimeElement = document.querySelector("#start_time_data");
-    startTimeElement.value = getSettings().startTime;
+function setupEpisodeTimeListeners(name) {
+    let timeElement = document.querySelector(`#${name}_time_data`);
+    timeElement.value = getSettings()[`${name}Time`];
 
-    console.log("INFO: Start time set");
+    console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time set`);
 
     let video = document.querySelector("video");
-    let plusElement = document.querySelector("#start_time_container .plus");
-    let minusElement = document.querySelector("#start_time_container .minus");
-    let setCurrentElement = document.querySelector("#start_time_container .set_current");
+    let plusElement = document.querySelector(`#${name}_time_container .plus`);
+    let minusElement = document.querySelector(`#${name}_time_container .minus`);
+    let setCurrentElement = document.querySelector(`#${name}_time_container .set_current`);
 
     plusElement.addEventListener("click", e => {
         e.preventDefault();
-        let newTime = parseInt(startTimeElement.value) + 1;
-        startTimeElement.value = newTime;
-        startTimeElement.dispatchEvent(new Event("input"));
+        let newTime = parseInt(timeElement.value) + 1;
+        timeElement.value = newTime;
+        timeElement.dispatchEvent(new Event("input"));
     });
 
     minusElement.addEventListener("click", e => {
         e.preventDefault();
-        let newTime = parseInt(startTimeElement.value) - 1;
-        startTimeElement.value = newTime;
-        startTimeElement.dispatchEvent(new Event("input"));
+        let newTime = parseInt(timeElement.value) - 1;
+        timeElement.value = newTime;
+        timeElement.dispatchEvent(new Event("input"));
     });
 
     setCurrentElement.addEventListener("click", e => {
         e.preventDefault();
-        startTimeElement.value = parseInt(video.currentTime);
-        startTimeElement.dispatchEvent(new Event("input"));
+        timeElement.value = parseInt(video.currentTime);
+        timeElement.dispatchEvent(new Event("input"));
     });
 
-    startTimeElement.addEventListener("input", e => {
+    timeElement.addEventListener("input", e => {
         if (e.target.value < 0) {
             e.target.value = 0;
-            console.log(`INFO: Invalid start time value (time < 0).`);
+            console.log(`INFO: Invalid ${name} time value (time < 0).`);
         } else if (e.target.value > video.duration) {
             e.target.value = parseInt(video.duration);
-            console.log(`INFO: Invalid start time value (time > video duration).`);
+            console.log(`INFO: Invalid ${name} time value (time > video duration).`);
         } else {
-            console.log(`INFO: Start time value changed to <${startTimeElement.value}>.`);
+            console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time value changed to <${timeElement.value}>.`);
             let settings = getSettings();
-            settings.startTime = Number(e.target.value);
+            settings[`${name}Time`] = Number(e.target.value);
             saveSettings(settings);
         }
     });
 
-    console.log("INFO: Episode start time listener set.");
-}
-
-function setupEpisodeEndTimeListeners() {
-
-}
-
-function setupEpisodeWarnTimeListeners() {
-
+    console.log(`INFO: Episode ${name} time listener set.`);
 }
 
 function getSettings() {
@@ -473,12 +465,12 @@ function saveSettings(settings) {
 }
 
 //Settigs pattern
-function Settings(name, prevEpisode, nextEpisode, startTime, endTime, delayTime, refresh) {
+function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, refresh) {
     this.name = name;
     this.prevEpisode = prevEpisode;
     this.nextEpisode = nextEpisode;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.delayTime = delayTime;
+    this.warnTime = warnTime;
     this.refresh = refresh;
 }

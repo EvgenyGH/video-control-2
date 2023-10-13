@@ -82,13 +82,10 @@ function setupMessageExchange() {
 
             settings.prevEpisode = msg.data.previousEpisode;
             settings.nextEpisode = msg.data.nextEpisode;
-            localStorage.setItem(settings.name, JSON.stringify(settings));
-
-            console.log(`INFO: Data saved. Data <${JSON.stringify(settings)}>.`);
-
+            saveSettings(settings);
             setTitle(settings.name);
             checkRefresh(settings);
-            setupControlPanelListeners(settings);
+            setupControlPanelListeners();
 
             console.log(`INFO: Control panel listeners set.`);
         }
@@ -294,14 +291,14 @@ function injectCSS() {
 }
 
 //toolbar listener set in setupVideoControls (not redifined)
-function setupControlPanelListeners(settings) {
+function setupControlPanelListeners() {
     setupRefreshEpisodeListener();
     setupPreviousEpisodeListener();
     setupNextEpisodeListener();
 
-    setupEpisodeStartTimeListeners();
-    setupEpisodeEndTimeListeners();
-    setupEpisodeWarnTimeListeners();
+    setupEpisodeTimeListeners("start");
+    setupEpisodeTimeListeners("warn");
+    setupEpisodeTimeListeners("end");
 
     console.log("INFO: All video toolbar listeners set.");
 }
@@ -323,9 +320,7 @@ function setupToolbarListeners() {
 function checkRefresh(settings) {
     if (settings.refresh) {
         settings.refresh = false;
-        localStorage.setItem(settings.name, JSON.stringify(settings));
-
-        console.log(`INFO: Settings saved.`);
+        saveSettings(settings);
 
         if (settings.nextEpisode !== null) {
             console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
@@ -339,13 +334,9 @@ function checkRefresh(settings) {
 function setupRefreshEpisodeListener() {
     document.querySelector("#refresh")
         .addEventListener("click", e => {
-            let name = document.querySelector(".controls_toolbar").title;
-            let settings = JSON.parse(localStorage.getItem(name));
-
+            let settings = getSettings();
             settings.refresh = true;
-            localStorage.setItem(name, JSON.stringify(settings));
-
-            console.log(`INFO: Settings saved.`);
+            saveSettings(settings);
 
             if (settings.prevEpisode !== null) {
                 console.log(`Opening url=<${settings.prevEpisode}>.`);
@@ -359,15 +350,14 @@ function setupRefreshEpisodeListener() {
                 element.textContent = "IT`S FIRST EPISODE";
             }
         });
+
+    console.log("INFO: Refresh listener set.");
 }
 
 function setupPreviousEpisodeListener() {
     document.querySelector("#previous_episode")
         .addEventListener("click", e => {
-            let name = document.querySelector(".controls_toolbar").title;
-            let settings = JSON.parse(localStorage.getItem(name));
-
-            console.log(`INFO: Settings recieved for <${name}>.`);
+            let settings = getSettings();
 
             if (settings.prevEpisode !== null) {
                 console.log(`Opening url=<${settings.prevEpisode}>.`);
@@ -381,15 +371,14 @@ function setupPreviousEpisodeListener() {
                 element.textContent = "NO EPISODE";
             }
         });
+
+    console.log("INFO: Previous episode listener set.");
 }
 
 function setupNextEpisodeListener() {
     document.querySelector("#next_episode")
         .addEventListener("click", e => {
-            let name = document.querySelector(".controls_toolbar").title;
-            let settings = JSON.parse(localStorage.getItem(name));
-
-            console.log(`INFO: Settings recieved for <${name}>.`);
+            let settings = getSettings();
 
             if (settings.nextEpisode !== null) {
                 console.log(`Opening url=<${settings.nextEpisode}>.`);
@@ -402,28 +391,86 @@ function setupNextEpisodeListener() {
                 element.textContent = "NO EPISODE";
             }
         });
+
+    console.log("INFO: Next episode listener set.");
 }
 
-function setupEpisodeStartTimeListeners() {
+function setupEpisodeTimeListeners(name) {
+    let timeElement = document.querySelector(`#${name}_time_data`);
+    timeElement.value = getSettings()[`${name}Time`];
 
+    console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time set`);
+
+    let video = document.querySelector("video");
+    let plusElement = document.querySelector(`#${name}_time_container .plus`);
+    let minusElement = document.querySelector(`#${name}_time_container .minus`);
+    let setCurrentElement = document.querySelector(`#${name}_time_container .set_current`);
+
+    plusElement.addEventListener("click", e => {
+        e.preventDefault();
+        let newTime = parseInt(timeElement.value) + 1;
+        timeElement.value = newTime;
+        timeElement.dispatchEvent(new Event("input"));
+    });
+
+    minusElement.addEventListener("click", e => {
+        e.preventDefault();
+        let newTime = parseInt(timeElement.value) - 1;
+        timeElement.value = newTime;
+        timeElement.dispatchEvent(new Event("input"));
+    });
+
+    setCurrentElement.addEventListener("click", e => {
+        e.preventDefault();
+        timeElement.value = parseInt(video.currentTime);
+        timeElement.dispatchEvent(new Event("input"));
+    });
+
+    timeElement.addEventListener("input", e => {
+        if (e.target.value < 0) {
+            e.target.value = 0;
+            console.log(`INFO: Invalid ${name} time value (time < 0).`);
+        } else if (e.target.value > video.duration) {
+            e.target.value = parseInt(video.duration);
+            console.log(`INFO: Invalid ${name} time value (time > video duration).`);
+        } else {
+            console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time value changed to <${timeElement.value}>.`);
+            let settings = getSettings();
+            settings[`${name}Time`] = Number(e.target.value);
+            saveSettings(settings);
+        }
+    });
+
+    console.log(`INFO: Episode ${name} time listener set.`);
 }
 
-function setupEpisodeEndTimeListeners() {
+function getSettings() {
+    let name = document.querySelector(".controls_toolbar").title;
+    let settings = localStorage.getItem(name);
 
+    if (settings === null) {
+        settings = new Settings(name, null, null, 0, 0, 5, false);
+    } else {
+        settings = JSON.parse(settings);
+    }
+
+    console.log(`INFO: Settings recieved for <${name}>.`);
+
+    return settings;
 }
 
-function setupEpisodeWarnTimeListeners() {
-
+function saveSettings(settings) {
+    localStorage.setItem(settings.name, JSON.stringify(settings));
+    console.log(`INFO: Data saved. Data <${JSON.stringify(settings)}>.`);
 }
-
 
 //Settigs pattern
-function Settings(name, prevEpisode, nextEpisode, startTime, endTime, delayTime, refresh) {
+function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, refresh) {
     this.name = name;
     this.prevEpisode = prevEpisode;
     this.nextEpisode = nextEpisode;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.delayTime = delayTime;
+    this.warnTime = warnTime;
     this.refresh = refresh;
 }

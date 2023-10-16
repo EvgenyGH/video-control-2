@@ -63,6 +63,24 @@ function mangavostExec() {
     setupMessageExchange();
     setupVideoControls();
     playVideo();
+    addFullscreenListener();
+}
+
+function addFullscreenListener() {
+    let fullscreenButton = document.querySelector("[id^=oframevideoplayer] > \
+                                    pjsdiv:nth-child(15) > pjsdiv:nth-child(3)");
+
+    document.body.addEventListener("keydown", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        fullscreenButton.click();
+
+        console.log(`INFO: Key <${e.key}> pressed. Fullscreen request sent`);
+    }, { once: true });
+
+    document.querySelector("iframe + pjsdiv video").focus();
+
+    console.log("INFO: Fullscreen on any key listener set.");
 }
 
 function setupMessageExchange() {
@@ -86,6 +104,7 @@ function setupMessageExchange() {
             setTitle(settings.name);
             checkRefresh(settings);
             setupControlPanelListeners();
+            setVideoStartTime(settings.startTime);
 
             console.log(`INFO: Control panel listeners set.`);
         }
@@ -122,10 +141,20 @@ async function playVideo() {
     }
 }
 
+async function setVideoStartTime(startTime) {
+    setTimeout(() => {
+        let video = document.querySelector("iframe + pjsdiv video");
+        video.currentTime = startTime;
+
+        console.log(`INFO: Start time set to <${settings.startTime}> sec.`);
+    }, 1000);
+}
+
 function setupVideoControls() {
     createVideoControls();
     injectCSS();
     setupToolbarListeners();
+    setTimerAlgorithm(); //todo
 }
 
 function createVideoControls() {
@@ -464,6 +493,25 @@ function saveSettings(settings) {
     console.log(`INFO: Data saved. Data <${JSON.stringify(settings)}>.`);
 }
 
+function setTimerAlgorithm() {
+    let video = document.querySelector("video");
+    let startTime = document.querySelector("#start_time_data");
+    let endTime = document.querySelector("#end_time_data");
+    let warnTime = document.querySelector("#warn_time_data");
+
+    video.addEventListener("updatetime", e => {
+        if (video.currentTime < parseInt(startTime.value)) {
+
+        } else if (video.currentTime > (video.duration - parseInt(endTime.value) - parseInt(warnTime.value))) {
+
+        } else if (video.currentTime > (video.duration - parseInt(endTime.value))) {
+
+        }
+    });
+
+    console.log(`INFO: Video progress listener set.`);
+}
+
 //Settigs pattern
 function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, refresh) {
     this.name = name;
@@ -474,3 +522,10 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
     this.warnTime = warnTime;
     this.refresh = refresh;
 }
+
+/*
+todo
+1. end timer warn timer
+2. hide/show after time
+4  if video ended
+*/

@@ -158,7 +158,7 @@ function setupVideoControls() {
     createVideoControls();
     injectCSS();
     setupToolbarListeners();
-    setTimerAlgorithm(); //todo
+    setTimerAlgorithm();
 }
 
 function createVideoControls() {
@@ -169,7 +169,7 @@ function createVideoControls() {
     controls.className = "controls_toolbar";
 
     buttons["start_time"] = createTimeElement("start_time", "Start time:");
-    buttons["warn_time"] = createTimeElement("warn_time", "Warn time:");
+    buttons["warn_time"] = createTimeElement("warn_time", "Warn time:", "Set default");
     buttons["end_time"] = createTimeElement("end_time", "End time:");
 
     buttons["prevEpisode"] = createNavElement("previous_episode", "Previous episode");
@@ -185,7 +185,7 @@ function createVideoControls() {
     console.log(`INFO: Video controls created.`);
 }
 
-function createTimeElement(name, labelText) {
+function createTimeElement(name, labelText, actionText = "Set current") {
     let timeElement = document.createElement("div");
     timeElement.id = `${name}_container`;
     timeElement.className = "time_container";
@@ -201,7 +201,7 @@ function createTimeElement(name, labelText) {
 
     let setCurrentElement = document.createElement("div");
     setCurrentElement.className = `set_current`;
-    setCurrentElement.textContent = "Set current";
+    setCurrentElement.textContent = actionText;
 
     let plusElement = document.createElement("div");
     plusElement.className = `plus`;
@@ -330,7 +330,7 @@ function setupControlPanelListeners() {
     setupNextEpisodeListener();
 
     setupEpisodeTimeListeners("start");
-    setupEpisodeTimeListeners("warn");
+    setupEpisodeTimeListeners("warn", 5);
     setupEpisodeTimeListeners("end");
 
     console.log("INFO: All video toolbar listeners set.");
@@ -428,7 +428,7 @@ function setupNextEpisodeListener() {
     console.log("INFO: Next episode listener set.");
 }
 
-function setupEpisodeTimeListeners(name) {
+function setupEpisodeTimeListeners(name, defaultValue = null) {
     let timeElement = document.querySelector(`#${name}_time_data`);
     timeElement.value = getSettings()[`${name}Time`];
 
@@ -455,7 +455,7 @@ function setupEpisodeTimeListeners(name) {
 
     setCurrentElement.addEventListener("click", e => {
         e.preventDefault();
-        timeElement.value = parseInt(video.currentTime);
+        timeElement.value = defaultValue == null ? parseInt(video.currentTime) : defaultValue;
         timeElement.dispatchEvent(new Event("input"));
     });
 
@@ -553,8 +553,8 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 
 /*
 todo
-1. end timer warn timer
 2. hide/show after time
-3. create timer
-4. change warn time;
+4. counter
+5. cancel counter (listener)
+6. time interpreter;
 */

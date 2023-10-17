@@ -70,15 +70,13 @@ function addFullscreenListener() {
     let fullscreenButton = document.querySelector("[id^=oframevideoplayer] > \
                                     pjsdiv:nth-child(15) > pjsdiv:nth-child(3)");
 
-    document.body.addEventListener("keydown", e => {
+    document.querySelector("iframe + pjsdiv video").addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
         fullscreenButton.click();
 
-        console.log(`INFO: Key <${e.key}> pressed. Fullscreen request sent`);
+        console.log(`INFO: Mouse clicked the video. Fullscreen request sent`);
     }, { once: true });
-
-    document.querySelector("iframe + pjsdiv video").focus();
 
     console.log("INFO: Fullscreen on any key listener set.");
 }
@@ -93,7 +91,8 @@ function setupMessageExchange() {
             let settings = localStorage.getItem(msg.data.name);
 
             if (settings === null) {
-                settings = new Settings(msg.data.name, null, null, 0, 0, 5, false);
+                let video = document.querySelector("iframe + pjsdiv video");
+                settings = new Settings(msg.data.name, null, null, 0, video.duration, 5, false);
             } else {
                 settings = JSON.parse(settings);
             }
@@ -142,11 +141,16 @@ async function playVideo() {
 }
 
 async function setVideoStartTime(startTime) {
-    setTimeout(() => {
-        let video = document.querySelector("iframe + pjsdiv video");
-        video.currentTime = startTime;
+    let video = document.querySelector("iframe + pjsdiv video");
 
-        console.log(`INFO: Start time set to <${settings.startTime}> sec.`);
+    setTimeout(() => {
+        if (video.currentTime < startTime) {
+            video.currentTime = startTime;
+
+            console.log(`INFO: Start time set to <${startTime}> sec.`);
+        } else {
+            console.log(`INFO: Start time not set. Playing on <${startTime}> sec.`);
+        }
     }, 1000);
 }
 
@@ -176,7 +180,7 @@ function createVideoControls() {
         controls.append(val);
     });
 
-    document.querySelector("video").parentElement.append(controls);
+    document.querySelector("iframe + pjsdiv video").parentElement.append(controls);
 
     console.log(`INFO: Video controls created.`);
 }
@@ -430,7 +434,7 @@ function setupEpisodeTimeListeners(name) {
 
     console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time set`);
 
-    let video = document.querySelector("video");
+    let video = document.querySelector("iframe + pjsdiv video");
     let plusElement = document.querySelector(`#${name}_time_container .plus`);
     let minusElement = document.querySelector(`#${name}_time_container .minus`);
     let setCurrentElement = document.querySelector(`#${name}_time_container .set_current`);
@@ -494,22 +498,46 @@ function saveSettings(settings) {
 }
 
 function setTimerAlgorithm() {
-    let video = document.querySelector("video");
-    let startTime = document.querySelector("#start_time_data");
-    let endTime = document.querySelector("#end_time_data");
-    let warnTime = document.querySelector("#warn_time_data");
+    let video = document.querySelector("iframe + pjsdiv video");
 
-    video.addEventListener("updatetime", e => {
-        if (video.currentTime < parseInt(startTime.value)) {
+    video.addEventListener("timeupdate", e => {
+        let videoCurrentTime = parseInt(video.currentTime);
+        let endTime = parseInt(document.querySelector("#end_time_data").value);
+        let warnTime = parseInt(document.querySelector("#warn_time_data").value);
 
-        } else if (video.currentTime > (video.duration - parseInt(endTime.value) - parseInt(warnTime.value))) {
+        if (videoCurrentTime >= endTime) {
+            let settings = getSettings();
 
-        } else if (video.currentTime > (video.duration - parseInt(endTime.value))) {
+            if (settings.nextEpisode !== null) {
+                console.log(`Opening url=<${settings.nextEpisode}>.`);
 
+                window.open(settings.nextEpisode, "_top");
+            } else {
+                video.pause();
+
+                console.log(`INFO: Video paused. No next episode.`);
+            }
+        } else if (videoCurrentTime >= (endTime - warnTime)) {
+            showTimer();
+            updateTimer(parseInt(endTime - videoCurrentTime));
+        } else {
+            hideTimer();
         }
     });
 
     console.log(`INFO: Video progress listener set.`);
+}
+
+function showTimer() {
+    console.log(`INFO: Timer showed.`);
+}
+
+function hideTimer() {
+    console.log("INFO: Timer hidden.");
+}
+
+function updateTimer(time) {
+    console.log(`INFO: Timer updated <${time}>.`);
 }
 
 //Settigs pattern
@@ -527,5 +555,6 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 todo
 1. end timer warn timer
 2. hide/show after time
-4  if video ended
+3. create timer
+4. change warn time;
 */

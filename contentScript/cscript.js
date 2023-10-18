@@ -342,8 +342,8 @@ function injectCSS() {
         .timer {
             position: static;
             font-size: 500%;
-            width: 1.2em;
-            height: 1.2em;
+            width: max-content;
+            padding: 1% 2%;
             text-align: center;
             margin: 0.01em 1% 0.01em auto;
             color: white;
@@ -547,6 +547,8 @@ function setTimerAlgorithm() {
                 window.open(settings.nextEpisode, "_top");
             } else {
                 video.pause();
+                showTimer();
+                updateTimer(parseInt(endTime - videoCurrentTime));
 
                 console.log(`INFO: Video paused. No next episode.`);
             }
@@ -562,21 +564,35 @@ function setTimerAlgorithm() {
 }
 
 function showTimer() {
-    console.log(`INFO: Timer showed.`);
+    let timer = document.querySelector("#avc_container .timer");
+
+    if (timer.style.display === "none") {
+        timer.style.display = "";
+
+        console.log("INFO: Timer shown.");
+    }
 }
 
 function hideTimer() {
-    console.log("INFO: Timer hidden.");
+    let timer = document.querySelector("#avc_container .timer");
+
+    if (timer.style.display !== "none") {
+        timer.style.display = "none";
+        timer.textContent = "";
+
+        console.log("INFO: Timer hidden.");
+    }
 }
 
 function updateTimer(time) {
+    document.querySelector("#avc_container .timer").textContent = time;
     console.log(`INFO: Timer updated <${time}>.`);
 }
 
 function createTimer() {
     let timer = document.createElement("div");
     timer.className = "timer";
-    timer.textContent = 5; //remove
+    timer.style.display = "none";
 
     console.log("INFO: Timer element created.");
 
@@ -597,8 +613,6 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 /*
 todo
 2. hide/show after time
-4. counter
-5. cancel counter (listener)
-6. time interpreter;
 7. maybe seeking?
+8. if video ends give a chace(time delay);
 */

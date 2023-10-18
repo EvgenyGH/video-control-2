@@ -164,6 +164,11 @@ function setupVideoControls() {
 function createVideoControls() {
     let buttons = {};
     let controls;
+    let avcContainer;
+    let timer;
+
+    avcContainer = document.createElement("div");
+    avcContainer.id = "avc_container";
 
     controls = document.createElement("div");
     controls.className = "controls_toolbar";
@@ -180,7 +185,11 @@ function createVideoControls() {
         controls.append(val);
     });
 
-    document.querySelector("iframe + pjsdiv video").parentElement.append(controls);
+    timer = createTimer();
+
+    document.querySelector("iframe + pjsdiv video").parentElement.append(avcContainer);
+    avcContainer.append(controls);
+    avcContainer.append(timer);
 
     console.log(`INFO: Video controls created.`);
 }
@@ -236,8 +245,17 @@ function injectCSS() {
     sheet = style.sheet;
 
     sheet.insertRule(`
-        .controls_toolbar {
+        #avc_container {
             position: absolute;
+            right: 1%;
+            top: 1%;
+            font-size: 100%;
+            box-sizing: border-box;
+    }`);
+
+    sheet.insertRule(`
+        .controls_toolbar {
+            position: static;
             right: 2%;
             top: 2%;
             font-size: 100%;
@@ -319,6 +337,21 @@ function injectCSS() {
         .set_current {
             border: thin dotted transparent;
         }`);
+
+    sheet.insertRule(`
+        .timer {
+            position: static;
+            font-size: 500%;
+            width: 1.2em;
+            height: 1.2em;
+            text-align: center;
+            margin: 0.01em 1% 0.01em auto;
+            color: white;
+            background-color: black;
+            opacity: 0.5;
+            line-height: normal;
+    }`);
+    
 
     console.log("INFO: Video controls style injected.");
 }
@@ -540,6 +573,16 @@ function updateTimer(time) {
     console.log(`INFO: Timer updated <${time}>.`);
 }
 
+function createTimer() {
+    let timer = document.createElement("div");
+    timer.className = "timer";
+    timer.textContent = 5; //remove
+
+    console.log("INFO: Timer element created.");
+
+    return timer;
+}
+
 //Settigs pattern
 function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, refresh) {
     this.name = name;
@@ -557,4 +600,5 @@ todo
 4. counter
 5. cancel counter (listener)
 6. time interpreter;
+7. maybe seeking?
 */

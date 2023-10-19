@@ -9,7 +9,7 @@ function main() {
             amediaExec();
             break;
         case "mangavost.org":
-            mangavostExec();
+            mangavostExecPartOne();
             break;
     }
 }
@@ -58,12 +58,17 @@ function setPrevNextLinks(prev, next) {
     console.log(`INFO: Listener set.`);
 }
 
-function mangavostExec() {
+function mangavostExecPartOne() {
+    setupVideoControls();
+    addFullscreenListener();
     disableAd();
     setupMessageExchange();
-    setupVideoControls();
+}
+
+function mangavostExecPartTwo() {
+    setupControlPanelListeners();
     playVideo();
-    addFullscreenListener();
+    setTimeout(setTimerAlgorithm, 1000);
 }
 
 function addFullscreenListener() {
@@ -102,10 +107,12 @@ function setupMessageExchange() {
             saveSettings(settings);
             setTitle(settings.name);
             checkRefresh(settings);
-            setupControlPanelListeners();
-            setTimerAlgorithm();
 
-            console.log(`INFO: Control panel listeners set.`);
+            console.log(`INFO: Recieved message computing finished.`);
+
+            mangavostExecPartTwo();
+
+            console.log(`INFO: Script setup finished.`);
         }
     });
 
@@ -531,21 +538,14 @@ function setTimerAlgorithm() {
         let settings = getSettings();
 
         if (videoCurrentTime >= settings.endTime) {
-            new Promise(r => setTimeout(() => {
-                video.pause();
-                r();
-            },
-                500))
-                .then(setPermanetTimerAlgorithm);
-        } else {
-            if (videoCurrentTime < settings.startTime) {
-                video.currentTime = settings.startTime;
+            video.pause();
+        } else if (videoCurrentTime < settings.startTime) {
+            video.currentTime = settings.startTime;
 
-                console.log(`INFO: Video start time set to <${video.currentTime}>.`);
-            }
-
-            setPermanetTimerAlgorithm();
+            console.log(`INFO: Video start time set to <${video.currentTime}>.`);
         }
+
+        setPermanetTimerAlgorithm();
     }, { once: true });
 
     console.log(`INFO: Temporary video progress listener set.`);
@@ -567,6 +567,7 @@ function setPermanetTimerAlgorithm() {
             if (settings.nextEpisode !== null) {
                 if (!video.paused) {
                     console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
+
                     window.open(settings.nextEpisode, "_top");
                 } else {
                     console.log(`INFO: Video is paused. Next episode link not opening.`);

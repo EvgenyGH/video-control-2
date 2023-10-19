@@ -68,7 +68,7 @@ function mangavostExecPartOne() {
 function mangavostExecPartTwo() {
     setupControlPanelListeners();
     playVideo();
-    setTimeout(setTimerAlgorithm, 1000);
+    setTimeout(setTimerAlgorithm, 500);
 }
 
 function addFullscreenListener() {

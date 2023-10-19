@@ -103,7 +103,6 @@ function setupMessageExchange() {
             setTitle(settings.name);
             checkRefresh(settings);
             setupControlPanelListeners();
-            //setVideoStartTime(settings.startTime);
             setTimerAlgorithm();
 
             console.log(`INFO: Control panel listeners set.`);
@@ -141,25 +140,10 @@ async function playVideo() {
     }
 }
 
-async function setVideoStartTime(startTime) {
-    let video = document.querySelector("iframe + pjsdiv video");
-
-    setTimeout(() => {
-        if (video.currentTime < startTime) {
-            video.currentTime = startTime;
-
-            console.log(`INFO: Start time set to <${startTime}> sec.`);
-        } else {
-            console.log(`INFO: Start time not set. Playing on <${startTime}> sec.`);
-        }
-    }, 1000);
-}
-
 function setupVideoControls() {
     createVideoControls();
     injectCSS();
     setupToolbarListeners();
-    //setTimerAlgorithm();
 }
 
 function createVideoControls() {
@@ -376,10 +360,18 @@ function setTitle(name) {
 }
 
 function setupToolbarListeners() {
-    document.querySelector(".controls_toolbar")
-        .addEventListener("click", e =>
-            e.stopPropagation()
-        );
+    let toolbar = document.querySelector("#avc_container .controls_toolbar");
+    let video = document.querySelector("iframe + pjsdiv video");
+
+    toolbar.addEventListener("click", e => e.stopPropagation());
+
+    video.addEventListener("play", e => {
+        toolbar.style.display = "none";
+    });
+
+    video.addEventListener("pause", e => {
+        toolbar.style.display = "";
+    });
 
     console.log("INFO: Controls toolbar listener set.");
 }
@@ -534,18 +526,9 @@ function saveSettings(settings) {
 function setTimerAlgorithm() {
     let video = document.querySelector("iframe + pjsdiv video");
 
-
     video.addEventListener("timeupdate", e => {
         let videoCurrentTime = parseInt(video.currentTime);
         let settings = getSettings();
-
-        if (videoCurrentTime < settings.startTime) {
-            video.currentTime = settings.startTime;
-
-            console.log(`INFO: Video start time set to <${video.currentTime}>.`);
-
-            setPermanetTimerAlgorithm();
-        }
 
         if (videoCurrentTime >= settings.endTime) {
             new Promise(r => setTimeout(() => {
@@ -555,9 +538,14 @@ function setTimerAlgorithm() {
                 500))
                 .then(setPermanetTimerAlgorithm);
         } else {
+            if (videoCurrentTime < settings.startTime) {
+                video.currentTime = settings.startTime;
+
+                console.log(`INFO: Video start time set to <${video.currentTime}>.`);
+            }
+
             setPermanetTimerAlgorithm();
         }
-
     }, { once: true });
 
     console.log(`INFO: Temporary video progress listener set.`);
@@ -573,11 +561,10 @@ function setPermanetTimerAlgorithm() {
 
         if (videoCurrentTime >= endTime) {
             let settings = getSettings();
+            showTimer();
+            updateTimer(parseInt(endTime - videoCurrentTime));
 
             if (settings.nextEpisode !== null) {
-                showTimer();
-                updateTimer(parseInt(endTime - videoCurrentTime));
-
                 if (!video.paused) {
                     console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
                     window.open(settings.nextEpisode, "_top");
@@ -586,8 +573,6 @@ function setPermanetTimerAlgorithm() {
                 }
             } else {
                 video.pause();
-                showTimer();
-                updateTimer(parseInt(endTime - videoCurrentTime));
 
                 console.log(`INFO: Video paused. No next episode.`);
             }
@@ -651,7 +636,5 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 
 /*
 todo
-2. hide/show after time
-7. maybe seeking? move before
-8. if video ends give a chace(time delay);
+1. time format;
 */

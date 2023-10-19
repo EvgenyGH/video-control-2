@@ -103,7 +103,8 @@ function setupMessageExchange() {
             setTitle(settings.name);
             checkRefresh(settings);
             setupControlPanelListeners();
-            setVideoStartTime(settings.startTime);
+            //setVideoStartTime(settings.startTime);
+            setTimerAlgorithm();
 
             console.log(`INFO: Control panel listeners set.`);
         }
@@ -158,7 +159,7 @@ function setupVideoControls() {
     createVideoControls();
     injectCSS();
     setupToolbarListeners();
-    setTimerAlgorithm();
+    //setTimerAlgorithm();
 }
 
 function createVideoControls() {
@@ -351,7 +352,7 @@ function injectCSS() {
             opacity: 0.5;
             line-height: normal;
     }`);
-    
+
 
     console.log("INFO: Video controls style injected.");
 }
@@ -533,6 +534,38 @@ function saveSettings(settings) {
 function setTimerAlgorithm() {
     let video = document.querySelector("iframe + pjsdiv video");
 
+
+    video.addEventListener("timeupdate", e => {
+        let videoCurrentTime = parseInt(video.currentTime);
+        let settings = getSettings();
+
+        if (videoCurrentTime < settings.startTime) {
+            video.currentTime = settings.startTime;
+
+            console.log(`INFO: Video start time set to <${video.currentTime}>.`);
+
+            setPermanetTimerAlgorithm();
+        }
+
+        if (videoCurrentTime >= settings.endTime) {
+            new Promise(r => setTimeout(() => {
+                video.pause();
+                r();
+            },
+                500))
+                .then(setPermanetTimerAlgorithm);
+        } else {
+            setPermanetTimerAlgorithm();
+        }
+
+    }, { once: true });
+
+    console.log(`INFO: Temporary video progress listener set.`);
+}
+
+function setPermanetTimerAlgorithm() {
+    let video = document.querySelector("iframe + pjsdiv video");
+
     video.addEventListener("timeupdate", e => {
         let videoCurrentTime = parseInt(video.currentTime);
         let endTime = parseInt(document.querySelector("#end_time_data").value);
@@ -542,9 +575,15 @@ function setTimerAlgorithm() {
             let settings = getSettings();
 
             if (settings.nextEpisode !== null) {
-                console.log(`Opening url=<${settings.nextEpisode}>.`);
+                showTimer();
+                updateTimer(parseInt(endTime - videoCurrentTime));
 
-                window.open(settings.nextEpisode, "_top");
+                if (!video.paused) {
+                    console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
+                    window.open(settings.nextEpisode, "_top");
+                } else {
+                    console.log(`INFO: Video is paused. Next episode link not opening.`);
+                }
             } else {
                 video.pause();
                 showTimer();
@@ -560,7 +599,7 @@ function setTimerAlgorithm() {
         }
     });
 
-    console.log(`INFO: Video progress listener set.`);
+    console.log(`INFO: Permanet video progress listener set.`);
 }
 
 function showTimer() {
@@ -613,6 +652,6 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 /*
 todo
 2. hide/show after time
-7. maybe seeking?
+7. maybe seeking? move before
 8. if video ends give a chace(time delay);
 */

@@ -358,6 +358,8 @@ function setupControlPanelListeners() {
     setupEpisodeTimeListeners("warn", 5);
     setupEpisodeTimeListeners("end");
 
+    setupTimerListener();
+
     console.log("INFO: All video toolbar listeners set.");
 }
 
@@ -510,6 +512,27 @@ function setupEpisodeTimeListeners(name, defaultValue = null) {
     console.log(`INFO: Episode ${name} time listener set.`);
 }
 
+function setupTimerListener() {
+    let timer = document.querySelector("#avc_container .timer");
+
+    timer.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        let settings = getSettings();
+        let endTimeElement = document.querySelector("#end_time_data");
+        endTimeElement.value = parseInt(settings.endTime) + 10;
+        endTimeElement.dispatchEvent(new Event("input"));
+        settings.endTime = parseInt(endTimeElement.value);
+
+        let video = document.querySelector("iframe + pjsdiv video");
+        timer.textContent = Math.ceil(settings.endTime - video.currentTime);
+        if paused???
+
+        saveSettings(settings);
+
+        console.log(`INFO: Video End time timer prolonged (+10 sec.).`);
+    });
+}
 function getSettings() {
     let name = document.querySelector(".controls_toolbar").title;
     let settings = localStorage.getItem(name);
@@ -638,4 +661,20 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 /*
 todo
 1. time format;
+2. prolong +10 when click counter;
+
+Number.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return hours+':'+minutes+':'+seconds;
+};
+
+3. description
+
 */

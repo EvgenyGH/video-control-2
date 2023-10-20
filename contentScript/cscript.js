@@ -43,6 +43,7 @@ function setPrevNextLinks(prev, next) {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
             const name = document.querySelector(".titlesp + a").text;
+            
             msg.source.postMessage({
                 request: "post_video_data",
                 name: name,
@@ -97,7 +98,7 @@ function setupMessageExchange() {
 
             if (settings === null) {
                 let video = document.querySelector("iframe + pjsdiv video");
-                settings = new Settings(msg.data.name, null, null, 0, video.duration, 5, false);
+                settings = new Settings(msg.data.name, null, null, 0, Math.floor(video.duration), 5, false);
             } else {
                 settings = JSON.parse(settings);
             }
@@ -498,15 +499,19 @@ function setupEpisodeTimeListeners(name, defaultValue = null) {
         if (e.target.value < 0) {
             e.target.value = 0;
             console.log(`INFO: Invalid ${name} time value (time < 0).`);
+            
         } else if (e.target.value > video.duration) {
             e.target.value = parseInt(video.duration);
             console.log(`INFO: Invalid ${name} time value (time > video duration).`);
         } else {
             console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time value changed to <${timeElement.value}>.`);
-            let settings = getSettings();
-            settings[`${name}Time`] = Number(e.target.value);
-            saveSettings(settings);
         }
+        
+        let settings = getSettings();
+        settings[`${name}Time`] = Number(e.target.value);
+        saveSettings(settings);
+        
+        video.dispatchEvent(new Event("timeupdate"));
     });
 
     console.log(`INFO: Episode ${name} time listener set.`);
@@ -518,21 +523,17 @@ function setupTimerListener() {
     timer.addEventListener("click", (e) => {
         e.stopPropagation();
 
-        let settings = getSettings();
         let endTimeElement = document.querySelector("#end_time_data");
-        endTimeElement.value = parseInt(settings.endTime) + 10;
+        endTimeElement.value = Number(endTimeElement.value) + 10;
         endTimeElement.dispatchEvent(new Event("input"));
-        settings.endTime = parseInt(endTimeElement.value);
-
+        
         let video = document.querySelector("iframe + pjsdiv video");
-        timer.textContent = Math.ceil(settings.endTime - video.currentTime);
-        if paused???
-
-        saveSettings(settings);
-
+        video.dispatchEvent(new Event("timeupdate"));
+        
         console.log(`INFO: Video End time timer prolonged (+10 sec.).`);
     });
 }
+
 function getSettings() {
     let name = document.querySelector(".controls_toolbar").title;
     let settings = localStorage.getItem(name);
@@ -661,7 +662,8 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 /*
 todo
 1. time format;
-2. prolong +10 when click counter;
+2. prolong +10 when click counter;+
+3. when no video just refresh
 
 Number.prototype.toHHMMSS = function () {
     var sec_num = parseInt(this, 10); // don't forget the second param

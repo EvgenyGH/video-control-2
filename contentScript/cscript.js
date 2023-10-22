@@ -1,6 +1,4 @@
-﻿main();
-
-function main() {
+﻿function main() {
     const title = /https:\/\/(?<title>.*?)\/.*?/.exec(window.location).groups["title"];
     console.log(`INFO: Content script injected to <${title}>.`);
 
@@ -659,24 +657,37 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
     this.refresh = refresh;
 }
 
-/*
-todo
-1. time format;
-2. prolong +10 when click counter;+
-3. when no video just refresh
-
-Number.prototype.toHHMMSS = function () {
-    var sec_num = parseInt(this, 10); // don't forget the second param
+function toTimeFormat() {
+	var sec_num = parseInt(this, 10);
     var hours   = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+    var seconds = sec_num % 60;
 
     if (hours   < 10) {hours   = "0"+hours;}
     if (minutes < 10) {minutes = "0"+minutes;}
     if (seconds < 10) {seconds = "0"+seconds;}
+    
     return hours+':'+minutes+':'+seconds;
-};
+}
 
+function toSec() {
+	let numbers = this.split(":");
+	let seconds = parseInt(numbers[0]) * 3600 + parseInt(numbers[1]) * 60 + parseInt(numbers[2]);
+	 
+	return seconds;
+}
+
+Number.prototype.toTimeFormat = toTimeFormat;
+
+String.prototype.toSec = toSec;
+
+main();
+
+
+/*
+todo
+1. time format;
+3. when no video just refresh
 3. description
 
 */

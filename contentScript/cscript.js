@@ -41,7 +41,7 @@ function setPrevNextLinks(prev, next) {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
             const name = document.querySelector(".titlesp + a").text;
-            
+
             msg.source.postMessage({
                 request: "post_video_data",
                 name: name,
@@ -198,6 +198,7 @@ function createTimeElement(name, labelText, actionText = "Set current") {
     inputElement.setAttribute('id', `${name}_data`);
     inputElement.setAttribute('type', 'number');
     inputElement.setAttribute('value', '0');
+    timeElement.title = parseInt(inputElement.value).toTimeFormat();
 
     let setCurrentElement = document.createElement("div");
     setCurrentElement.className = `set_current`;
@@ -226,6 +227,7 @@ function createNavElement(id, text) {
     navElement.textContent = text;
     navElement.id = id;
     navElement.className = "navigation_button";
+    navElement.title = text;
 
     return navElement;
 }
@@ -465,6 +467,7 @@ function setupNextEpisodeListener() {
 function setupEpisodeTimeListeners(name, defaultValue = null) {
     let timeElement = document.querySelector(`#${name}_time_data`);
     timeElement.value = getSettings()[`${name}Time`];
+    timeElement.parentElement.title = parseInt(timeElement.value).toTimeFormat();
 
     console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time set`);
 
@@ -497,18 +500,20 @@ function setupEpisodeTimeListeners(name, defaultValue = null) {
         if (e.target.value < 0) {
             e.target.value = 0;
             console.log(`INFO: Invalid ${name} time value (time < 0).`);
-            
+
         } else if (e.target.value > video.duration) {
             e.target.value = parseInt(video.duration);
             console.log(`INFO: Invalid ${name} time value (time > video duration).`);
         } else {
             console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time value changed to <${timeElement.value}>.`);
         }
-        
+
+        timeElement.parentElement.title = parseInt(e.target.value).toTimeFormat();
+
         let settings = getSettings();
         settings[`${name}Time`] = Number(e.target.value);
         saveSettings(settings);
-        
+
         video.dispatchEvent(new Event("timeupdate"));
     });
 
@@ -524,10 +529,10 @@ function setupTimerListener() {
         let endTimeElement = document.querySelector("#end_time_data");
         endTimeElement.value = Number(endTimeElement.value) + 10;
         endTimeElement.dispatchEvent(new Event("input"));
-        
+
         let video = document.querySelector("iframe + pjsdiv video");
         video.dispatchEvent(new Event("timeupdate"));
-        
+
         console.log(`INFO: Video End time timer prolonged (+10 sec.).`);
     });
 }
@@ -658,23 +663,23 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 }
 
 function toTimeFormat() {
-	var sec_num = parseInt(this, 10);
-    var hours   = Math.floor(sec_num / 3600);
+    var sec_num = parseInt(this, 10);
+    var hours = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num % 60;
 
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    
-    return hours+':'+minutes+':'+seconds;
+    if (hours < 10) { hours = "0" + hours; }
+    if (minutes < 10) { minutes = "0" + minutes; }
+    if (seconds < 10) { seconds = "0" + seconds; }
+
+    return hours + ':' + minutes + ':' + seconds;
 }
 
 function toSec() {
-	let numbers = this.split(":");
-	let seconds = parseInt(numbers[0]) * 3600 + parseInt(numbers[1]) * 60 + parseInt(numbers[2]);
-	 
-	return seconds;
+    let numbers = this.split(":");
+    let seconds = parseInt(numbers[0]) * 3600 + parseInt(numbers[1]) * 60 + parseInt(numbers[2]);
+
+    return seconds;
 }
 
 Number.prototype.toTimeFormat = toTimeFormat;
@@ -686,7 +691,7 @@ main();
 
 /*
 todo
-1. time format;
+1. time input type??;
 3. when no video just refresh
 3. description
 

@@ -58,7 +58,7 @@ function scrollToPlayer() {
 }
 
 function refreshCheck(secondEl) {
-    const name = document.querySelector(".titlesp + a").text;
+    const name = getVideoName();
     let settings = JSON.parse(localStorage.getItem(name)) ?? { name: name, refresh: false };
 
     if (settings.refresh) {
@@ -71,6 +71,7 @@ function refreshCheck(secondEl) {
         window.open(secondEl.href, "_top");
     }
 }
+
 function insertShortPanCSS() {
     let style = document.createElement("style");
     document.head.appendChild(style);
@@ -119,7 +120,7 @@ function insertShortPanCSS() {
 }
 
 function addShortPanListeners(firsrEl) {
-    const name = document.querySelector(".titlesp + a").text;
+    const name = getVideoName();
     let refresh = document.querySelector("#short_control_panel .short_refresh");
     let prevEpisode = document.querySelector("#short_control_panel .short_prev_episode");
 
@@ -171,7 +172,7 @@ function setMessageListener(prev, next) {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
-            const name = document.querySelector(".titlesp + a").text;
+            const name = getVideoName();
 
             msg.source.postMessage({
                 request: "post_video_data",
@@ -186,6 +187,17 @@ function setMessageListener(prev, next) {
     });
 
     console.log(`INFO: Listener set.`);
+}
+
+function getVideoName() {
+    let name = document.querySelector(".titlesp + a")?.text;
+
+    if (!name) {
+        name = document.querySelector(".film-wr h1").textContent;
+        name = /«(?<name>.*)»/.exec(name).groups["name"];
+    }
+
+    return name;
 }
 
 function mangavostExecPartOne() {
@@ -240,9 +252,7 @@ function setupMessageExchange() {
 
             console.log(`INFO: Recieved message computing finished.`);
 
-            mangavostExecPartTwo();
-
-            console.log(`INFO: Script setup finished.`);
+            setTimeout(mangavostExecPartTwo, 500);
         }
     });
 
@@ -818,3 +828,5 @@ Number.prototype.toTimeFormat = toTimeFormat;
 String.prototype.toSec = toSec;
 
 main();
+
+    //end time not set

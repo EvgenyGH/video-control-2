@@ -18,25 +18,156 @@ function amediaExec() {
 
     if (secondEl) {
         if (getTitle(secondEl) === "Следующая") {
-            setPrevNextLinks(firstEl.href, secondEl.href);
+            handlePageData(firstEl, secondEl);
         } else {
             if (getTitle(firstEl) === "Предыдущая") {
-                setPrevNextLinks(firstEl.href, null);
+                handlePageData(firstEl, null);
             } else {
-                setPrevNextLinks(null, firstEl.href);
+                handlePageData(null, firstEl);
             }
         }
     } else {
-        setPrevNextLinks(null, null);
+        handlePageData(null, null);
     }
+}
 
+function handlePageData(firstEl, secondEl) {
+    refreshCheck(secondEl);
+
+    const src = document.querySelector(".players-section iframe").src;
+
+    if (/.*\.jpg$/.test(src)) {
+        showShortPanel(firstEl);
+    } else {
+        setMessageListener(firstEl?.href ?? null, secondEl?.href ?? null);
+    }
+}
+
+function showShortPanel(firstEl) {
+    createShortPan();
+    insertShortPanCSS();
+    addShortPanListeners(firstEl);
+    scrollToPlayer();
+}
+
+function scrollToPlayer() {
+    let container = document.querySelector(".players-section .box.visible");
+    container.scrollIntoView();
+
+    console.log("INFO: Player in view.");
+}
+
+function refreshCheck(secondEl) {
+    const name = document.querySelector(".titlesp + a").text;
+    let settings = JSON.parse(localStorage.getItem(name)) ?? { name: name, refresh: false };
+
+    if (settings.refresh) {
+        settings.refresh = false;
+        localStorage.setItem(name, JSON.stringify(settings));
+
+        console.log(`INFO: Refresh data for <${name}> saved.`);
+        console.log(`INFO: Refresh. Opening next episode url=<${secondEl.href}>.`);
+
+        window.open(secondEl.href, "_top");
+    }
+}
+function insertShortPanCSS() {
+    let style = document.createElement("style");
+    document.head.appendChild(style);
+    let sheet = style.sheet;
+
+    sheet.insertRule(`#short_control_panel {
+                              box-sizing: border-box;
+                              position: absolute;
+                              right: 6%;
+                              top: 12%;
+                              color: Chartreuse;
+                              text-align: center;
+                              line-height: 1.6;
+                              display: flex;
+                              gap: 2% 2%;
+                              padding: 1%;
+    }`);
+
+    sheet.insertRule(`.short_refresh,
+                      .short_prev_episode {
+                              font-size: 100%;
+                              box-sizing: border-box;
+                              white-space: nowrap;
+                              padding: 0% 2%;
+                              border: 1px solid Chartreuse;
+                              border-radius: 15%;
+                              flex-wrap: nowrap;
+                              justify-content: space-around;
+    }`);
+
+    sheet.insertRule(`.short_refresh:hover,
+                      .short_prev_episode:hover {
+                              background-color: rgba(178, 34, 34, 0.6);
+                              font-weight: bold;
+    }`);
+
+    sheet.insertRule(`.short_refresh {
+                              width: 6em;  
+    }`);
+
+    sheet.insertRule(`.short_prev_episode {
+                              width: 10em;
+    }`);
+
+    console.log("INFO: Short CSS inserted.");
+}
+
+function addShortPanListeners(firsrEl) {
+    const name = document.querySelector(".titlesp + a").text;
+    let refresh = document.querySelector("#short_control_panel .short_refresh");
+    let prevEpisode = document.querySelector("#short_control_panel .short_prev_episode");
+
+    prevEpisode.addEventListener("click", e => {
+        console.log(`INFO: Opening previous episod url=<${firsrEl.href}>.`);
+
+        window.open(firsrEl.href, "_top");
+    });
+
+    refresh.addEventListener("click", e => {
+        let settings = JSON.parse(localStorage.getItem(name)) ?? { name: name, refresh: true };
+        settings.refresh = true;
+        localStorage.setItem(name, JSON.stringify(settings));
+
+        console.log(`INFO: Refresh data for <${name}> saved.`);
+
+        prevEpisode.click();
+    });
+}
+
+function createShortPan() {
+    let container = document.querySelector(".players-section .box.visible");
+    let controlPanel = document.createElement("div");
+    let refresh = document.createElement("div");
+    let prevEpisode = document.createElement("div");
+
+    controlPanel.id = "short_control_panel";
+
+    refresh.textContent = "Refresh";
+    refresh.title = "Refresh";
+    refresh.className = "short_refresh";
+
+    prevEpisode.textContent = "Previous episode";
+    prevEpisode.title = "Previous episode";
+    prevEpisode.className = "short_prev_episode"
+
+    controlPanel.appendChild(prevEpisode);
+    controlPanel.appendChild(refresh);
+    container.appendChild(controlPanel);
+
+    console.log("INFO: Short control panel created.");
 }
 
 function getTitle(element) {
     return /^(?<title>[А-Яа-я]+)\s\d+\s[А-Яа-я]+/.exec(element.textContent)?.groups.title;
 }
 
-function setPrevNextLinks(prev, next) {
+function setMessageListener(prev, next) {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
@@ -690,9 +821,5 @@ main();
 
 
 /*
-todo
-1. time input type??;
-3. when no video just refresh
-3. description
-
+1. description
 */

@@ -818,8 +818,3 @@ Number.prototype.toTimeFormat = toTimeFormat;
 String.prototype.toSec = toSec;
 
 main();
-
-
-/*
-1. description
-*/

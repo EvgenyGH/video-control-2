@@ -18,12 +18,12 @@ function amediaExec() {
 
     if (secondEl) {
         if (getTitle(secondEl) === "Следующая") {
-            handlePageData(firstEl.href, secondEl.href);
+            handlePageData(firstEl, secondEl);
         } else {
             if (getTitle(firstEl) === "Предыдущая") {
-                handlePageData(firstEl.href, null);
+                handlePageData(firstEl, null);
             } else {
-                handlePageData(null, firstEl.href);
+                handlePageData(null, firstEl);
             }
         }
     } else {
@@ -32,22 +32,21 @@ function amediaExec() {
 }
 
 function handlePageData(firstEl, secondEl) {
+    refreshCheck(secondEl);
+
     const src = document.querySelector(".players-section iframe").src;
 
     if (/.*\.jpg$/.test(src)) {
         showShortPanel(firstEl);
     } else {
-        setMessageListener(firstEl, secondEl);
+        setMessageListener(firstEl?.href ?? null, secondEl?.href ?? null);
     }
 }
 
-function showShortPanel(href) {
-    const name = document.querySelector(".titlesp + a").text;
-
-    //refreshCheck(name);
+function showShortPanel(firstEl) {
     createShortPan();
     insertShortPanCSS();
-    //addShortPanListeners();
+    addShortPanListeners(firstEl);
     scrollToPlayer();
 }
 
@@ -58,9 +57,19 @@ function scrollToPlayer() {
     console.log("INFO: Player in view.");
 }
 
-function refreshCheck(name) {
-    
-    //localStorage.getItem
+function refreshCheck(secondEl) {
+    const name = document.querySelector(".titlesp + a").text;
+    let settings = JSON.parse(localStorage.getItem(name)) ?? { name: name, refresh: false };
+
+    if (settings.refresh) {
+        settings.refresh = false;
+        localStorage.setItem(name, JSON.stringify(settings));
+
+        console.log(`INFO: Refresh data for <${name}> saved.`);
+        console.log(`INFO: Refresh. Opening next episode url=<${secondEl.href}>.`);
+
+        window.open(secondEl.href, "_top");
+    }
 }
 function insertShortPanCSS() {
     let style = document.createElement("style");
@@ -109,15 +118,25 @@ function insertShortPanCSS() {
     console.log("INFO: Short CSS inserted.");
 }
 
-function addShortPanListeners() {
-    //selector
+function addShortPanListeners(firsrEl) {
+    const name = document.querySelector(".titlesp + a").text;
+    let refresh = document.querySelector("#short_control_panel .short_refresh");
+    let prevEpisode = document.querySelector("#short_control_panel .short_prev_episode");
+
+    prevEpisode.addEventListener("click", e => {
+        console.log(`INFO: Opening previous episod url=<${firsrEl.href}>.`);
+
+        window.open(firsrEl.href, "_top");
+    });
 
     refresh.addEventListener("click", e => {
-        console.log(`INFO: Opening url=<${navElement.href}>.`);
+        let settings = JSON.parse(localStorage.getItem(name)) ?? { name: name, refresh: true };
+        settings.refresh = true;
+        localStorage.setItem(name, JSON.stringify(settings));
 
-        //localStorage.setItem()
+        console.log(`INFO: Refresh data for <${name}> saved.`);
 
-        window.open(settings.nextEpisode, "_top");
+        prevEpisode.click();
     });
 }
 
@@ -802,9 +821,5 @@ main();
 
 
 /*
-todo
-1. time input type??;
-3. when no video just refresh
-3. description
-
+1. description
 */

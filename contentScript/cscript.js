@@ -18,25 +18,137 @@ function amediaExec() {
 
     if (secondEl) {
         if (getTitle(secondEl) === "Следующая") {
-            setPrevNextLinks(firstEl.href, secondEl.href);
+            handlePageData(firstEl.href, secondEl.href);
         } else {
             if (getTitle(firstEl) === "Предыдущая") {
-                setPrevNextLinks(firstEl.href, null);
+                handlePageData(firstEl.href, null);
             } else {
-                setPrevNextLinks(null, firstEl.href);
+                handlePageData(null, firstEl.href);
             }
         }
     } else {
-        setPrevNextLinks(null, null);
+        handlePageData(null, null);
     }
+}
 
+function handlePageData(firstEl, secondEl) {
+    const src = document.querySelector(".players-section iframe").src;
+
+    if (/.*\.jpg$/.test(src)) {
+        showShortPanel(firstEl);
+    } else {
+        setMessageListener(firstEl, secondEl);
+    }
+}
+
+function showShortPanel(href) {
+    const name = document.querySelector(".titlesp + a").text;
+
+    //refreshCheck(name);
+    createShortPan();
+    insertShortPanCSS();
+    //addShortPanListeners();
+    scrollToPlayer();
+}
+
+function scrollToPlayer() {
+    let container = document.querySelector(".players-section .box.visible");
+    container.scrollIntoView();
+
+    console.log("INFO: Player in view.");
+}
+
+function refreshCheck(name) {
+    
+    //localStorage.getItem
+}
+function insertShortPanCSS() {
+    let style = document.createElement("style");
+    document.head.appendChild(style);
+    let sheet = style.sheet;
+
+    sheet.insertRule(`#short_control_panel {
+                              box-sizing: border-box;
+                              position: absolute;
+                              right: 6%;
+                              top: 12%;
+                              color: Chartreuse;
+                              text-align: center;
+                              line-height: 1.6;
+                              display: flex;
+                              gap: 2% 2%;
+                              padding: 1%;
+    }`);
+
+    sheet.insertRule(`.short_refresh,
+                      .short_prev_episode {
+                              font-size: 100%;
+                              box-sizing: border-box;
+                              white-space: nowrap;
+                              padding: 0% 2%;
+                              border: 1px solid Chartreuse;
+                              border-radius: 15%;
+                              flex-wrap: nowrap;
+                              justify-content: space-around;
+    }`);
+
+    sheet.insertRule(`.short_refresh:hover,
+                      .short_prev_episode:hover {
+                              background-color: rgba(178, 34, 34, 0.6);
+                              font-weight: bold;
+    }`);
+
+    sheet.insertRule(`.short_refresh {
+                              width: 6em;  
+    }`);
+
+    sheet.insertRule(`.short_prev_episode {
+                              width: 10em;
+    }`);
+
+    console.log("INFO: Short CSS inserted.");
+}
+
+function addShortPanListeners() {
+    //selector
+
+    refresh.addEventListener("click", e => {
+        console.log(`INFO: Opening url=<${navElement.href}>.`);
+
+        //localStorage.setItem()
+
+        window.open(settings.nextEpisode, "_top");
+    });
+}
+
+function createShortPan() {
+    let container = document.querySelector(".players-section .box.visible");
+    let controlPanel = document.createElement("div");
+    let refresh = document.createElement("div");
+    let prevEpisode = document.createElement("div");
+
+    controlPanel.id = "short_control_panel";
+
+    refresh.textContent = "Refresh";
+    refresh.title = "Refresh";
+    refresh.className = "short_refresh";
+
+    prevEpisode.textContent = "Previous episode";
+    prevEpisode.title = "Previous episode";
+    prevEpisode.className = "short_prev_episode"
+
+    controlPanel.appendChild(prevEpisode);
+    controlPanel.appendChild(refresh);
+    container.appendChild(controlPanel);
+
+    console.log("INFO: Short control panel created.");
 }
 
 function getTitle(element) {
     return /^(?<title>[А-Яа-я]+)\s\d+\s[А-Яа-я]+/.exec(element.textContent)?.groups.title;
 }
 
-function setPrevNextLinks(prev, next) {
+function setMessageListener(prev, next) {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);

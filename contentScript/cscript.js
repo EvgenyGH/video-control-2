@@ -19,12 +19,10 @@ function amediaExec() {
     if (secondEl) {
         if (getTitle(secondEl) === "Следующая") {
             handlePageData(firstEl, secondEl);
+        } else if (getTitle(firstEl) === "Предыдущая") {
+            handlePageData(firstEl, null);
         } else {
-            if (getTitle(firstEl) === "Предыдущая") {
-                handlePageData(firstEl, null);
-            } else {
-                handlePageData(null, firstEl);
-            }
+            handlePageData(null, secondEl);
         }
     } else {
         handlePageData(null, null);
@@ -279,9 +277,10 @@ function setupMessageExchange() {
 
     console.log(`INFO: Listener set.`);
 
-    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
-
-    console.log(`INFO: Message sent. Request <get_video_data>.`);
+    setTimeout(() => {
+    	window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
+		console.log(`INFO: Message sent. Request <get_video_data>.`);
+		}, 500);
 }
 
 function updateEndTime(endTime) {

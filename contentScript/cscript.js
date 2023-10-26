@@ -209,8 +209,22 @@ function mangavostExecPartOne() {
 
 function mangavostExecPartTwo() {
     setupControlPanelListeners();
-    playVideo();
-    setTimeout(setTimerAlgorithm, 500);
+    setPlayListeners();
+    //setTimeout(setTimerAlgorithm, 500);
+}
+
+function setPlayListeners() {
+    let video = document.querySelector("iframe + pjsdiv video");
+
+    if (!video?.duration) {
+        video.addEventListener("loadedmetadata", e => {
+            playVideo();
+            setTimeout(setTimerAlgorithm, 1000);
+        }, { once: true });
+    } else {
+        playVideo();
+        setTimeout(setTimerAlgorithm, 1000);
+    }
 }
 
 function addFullscreenListener() {
@@ -244,8 +258,8 @@ function setupMessageExchange() {
                 video.addEventListener("loadedmetadata", (e) => {
                     settings.endTime = Math.floor(video.duration);
                     saveSettings(settings);
-                    updateEndTime(settings.endTime);                    
-                        
+                    updateEndTime(settings.endTime);
+
                     console.log(`INFO: End time for new video set. Video <${settings.name}>. End time <${settings.endTime}>.`);
                 }, { once: true });
             } else {
@@ -260,7 +274,7 @@ function setupMessageExchange() {
 
             console.log(`INFO: Recieved message computing finished.`);
 
-            setTimeout(mangavostExecPartTwo, 1000);
+            mangavostExecPartTwo();
         }
     });
 
@@ -272,8 +286,10 @@ function setupMessageExchange() {
 }
 
 function updateEndTime(endTime) {
-    document.querySelector("#end_time_data").value = settings.endTime;
+    document.querySelector("#end_time_data").value = endTime;
     document.querySelector("#end_time_container").title = endTime.toTimeFormat;
+
+    console.log("INFO: End time value on control panel updated.");
 }
 
 async function disableAd() {
@@ -720,6 +736,8 @@ function setTimerAlgorithm() {
 
         if (videoCurrentTime >= settings.endTime) {
             video.pause();
+
+            console.log("INFO: Video paused.");
         } else if (videoCurrentTime < settings.startTime) {
             video.currentTime = settings.startTime;
 

@@ -210,7 +210,6 @@ function mangavostExecPartOne() {
 function mangavostExecPartTwo() {
     setupControlPanelListeners();
     setPlayListeners();
-    //setTimeout(setTimerAlgorithm, 500);
 }
 
 function setPlayListeners() {

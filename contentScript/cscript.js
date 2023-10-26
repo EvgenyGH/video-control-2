@@ -240,6 +240,14 @@ function setupMessageExchange() {
             if (settings === null) {
                 let video = document.querySelector("iframe + pjsdiv video");
                 settings = new Settings(msg.data.name, null, null, 0, Math.floor(video.duration), 5, false);
+
+                video.addEventListener("loadedmetadata", (e) => {
+                    settings.endTime = Math.floor(video.duration);
+                    saveSettings(settings);
+                    updateEndTime(settings.endTime);                    
+                        
+                    console.log(`INFO: End time for new video set. Video <${settings.name}>. End time <${settings.endTime}>.`);
+                }, { once: true });
             } else {
                 settings = JSON.parse(settings);
             }
@@ -252,7 +260,7 @@ function setupMessageExchange() {
 
             console.log(`INFO: Recieved message computing finished.`);
 
-            setTimeout(mangavostExecPartTwo, 500);
+            setTimeout(mangavostExecPartTwo, 1000);
         }
     });
 
@@ -261,6 +269,11 @@ function setupMessageExchange() {
     window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
 
     console.log(`INFO: Message sent. Request <get_video_data>.`);
+}
+
+function updateEndTime(endTime) {
+    document.querySelector("#end_time_data").value = settings.endTime;
+    document.querySelector("#end_time_container").title = endTime.toTimeFormat;
 }
 
 async function disableAd() {
@@ -828,5 +841,3 @@ Number.prototype.toTimeFormat = toTimeFormat;
 String.prototype.toSec = toSec;
 
 main();
-
-    //end time not set

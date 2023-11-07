@@ -38,5 +38,5 @@ Click on the name of the extension to see more details. Select Permissions
 to see all permissions requested by the extension. Turn each permission on
 with the toggle switch. 
 6. Allow autoplay:  
-For this follow [Firefox instructions](href=https://support.mozilla.org/en-US/kb/block-autoplay)
+For this follow [Firefox instructions](https://support.mozilla.org/en-US/kb/block-autoplay)
 7. Have fun!

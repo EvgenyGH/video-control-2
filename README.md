@@ -31,12 +31,12 @@ For this:
 Open the Add-ons Manger > click on the gear icon (Tools for all add-ons) > 
 Install Add-on From File.. > browse to the add-on > 
 double click the add-on (or select Open) > Install Now.
-4. Give host permissions.  
+5. Give host permissions.  
 For this:  
 Click the menu button, click Add-ons and themes and select Extensions.
 Click on the name of the extension to see more details. Select Permissions 
 to see all permissions requested by the extension. Turn each permission on
 with the toggle switch. 
-5. Allow autoplay:  
-For this follow tis [Firefox instructions](href=https://support.mozilla.org/en-US/kb/block-autoplay)
-6. Have fun!
+6. Allow autoplay:  
+For this follow [Firefox instructions](href=https://support.mozilla.org/en-US/kb/block-autoplay)
+7. Have fun!

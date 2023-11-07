@@ -19,5 +19,11 @@
   "incognito": "not_allowed",
   "icons": {
     "96": "/icon/aniface.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{538ec0d6-cea2-42a2-afa6-2ad0db7a9ed5}",
+      "strict_min_version": "42.0"
+    }
   }
 }

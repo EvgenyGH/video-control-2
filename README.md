@@ -1,6 +1,6 @@
 # Anime video control plugin (AVC)
 ### Description:
-Plugin offers addititional control over video content on site https://amedia.online.
+Plugin offers additional control over video content on site https://amedia.online.
 It includes:
 1. AD block;
 2. Additional control panel;

@@ -16,5 +16,8 @@
       "run_at": "document_idle"
     }
   ],
-  "incognito": "not_allowed"
+  "incognito": "not_allowed",
+  "icons": {
+    "96": "/icon/aniface.png"
+  }
 }

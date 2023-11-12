@@ -15,22 +15,26 @@ It includes:
 11. Persist data for every anime.
 ### System requirements:
 Firefox 118.0.2
-### Insatallation
+### Installation
+_First way (preferable):_  
+Install this addon from site addons.mozilla.org [_(Link)_](https://addons.mozilla.org/ru/firefox/addon/anime-video-control/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search)
+
+_Second way (install as temporary add-on):_  
 Steps to install:
-1. Clone this repositorty.  
+1. Clone this repository.  
 ```git clone git@github.com:EvgenyGH/video-control-2.git```
 2. Put files to zip archive. Example with 7-zip:  
 ```7z.exe a -tzip plugin.zip * -x!*.gitignore```
-3. Make Firefox install Unsigned Extensions (or sign it:)).   
+3. Make Firefox install Unsigned Extensions (or sign it).   
 For this:  
 Type about:config into the URL bar in Firefox In the Search box type 
 xpinstall.signatures.required. Double-click the preference, or 
-right-click and selected “Toggle”, to set it to False.
+right-click and selected "Toggle", to set it to False.
 4. Load extension to Firefox from the file.  
 For this:  
-Open the Add-ons Manger > click on the gear icon (Tools for all add-ons) > 
-Install Add-on From File.. > browse to the add-on > 
-double click the add-on (or select Open) > Install Now.
+Open Firefox. Enter "about:debugging" in the URL bar.
+Click "Load Temporary Add-on". Open the extension's directory and select `plugin.zip`.
+The extension will be installed, and will stay installed until you restart Firefox.
 5. Give host permissions.  
 For this:  
 Click the menu button, click Add-ons and themes and select Extensions.

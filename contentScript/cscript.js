@@ -247,9 +247,9 @@ function setupMessageExchange() {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
 
             let settings = localStorage.getItem(msg.data.name);
+            let video = document.querySelector("iframe + pjsdiv video");
 
             if (settings === null) {
-                let video = document.querySelector("iframe + pjsdiv video");
                 settings = new Settings(msg.data.name, null, null, 0, Math.floor(video.duration), 5, false);
 
                 video.addEventListener("loadedmetadata", (e) => {
@@ -261,6 +261,10 @@ function setupMessageExchange() {
                 }, { once: true });
             } else {
                 settings = JSON.parse(settings);
+
+                if (video.duration < settings.endTime) {
+                    settings.endTime = Math.floor(video.duration);
+                }
             }
 
             settings.prevEpisode = msg.data.previousEpisode;

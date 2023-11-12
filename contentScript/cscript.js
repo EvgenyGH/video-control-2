@@ -117,15 +117,15 @@ function insertShortPanCSS() {
     console.log("INFO: Short CSS inserted.");
 }
 
-function addShortPanListeners(firsrEl) {
+function addShortPanListeners(firstEl) {
     const name = getVideoName();
     let refresh = document.querySelector("#short_control_panel .short_refresh");
     let prevEpisode = document.querySelector("#short_control_panel .short_prev_episode");
 
     prevEpisode.addEventListener("click", e => {
-        console.log(`INFO: Opening previous episod url=<${firsrEl.href}>.`);
+        console.log(`INFO: Opening previous episod url=<${firstEl.href}>.`);
 
-        window.open(firsrEl.href, "_top");
+        window.open(firstEl.href, "_top");
     });
 
     refresh.addEventListener("click", e => {
@@ -269,7 +269,7 @@ function setupMessageExchange() {
             setTitle(settings.name);
             checkRefresh(settings);
 
-            console.log(`INFO: Recieved message computing finished.`);
+            console.log(`INFO: Received message computing finished.`);
 
             mangavostExecPartTwo();
         }
@@ -403,7 +403,7 @@ function createNavElement(id, text) {
 function injectCSS() {
     let style = document.createElement("style");
     document.head.appendChild(style);
-    sheet = style.sheet;
+    let sheet = style.sheet;
 
     sheet.insertRule(`
         #avc_container {
@@ -517,7 +517,7 @@ function injectCSS() {
     console.log("INFO: Video controls style injected.");
 }
 
-//toolbar listener set in setupVideoControls (not redifined)
+//toolbar listener set in setupVideoControls (not redefined)
 function setupControlPanelListeners() {
     setupRefreshEpisodeListener();
     setupPreviousEpisodeListener();
@@ -742,13 +742,13 @@ function setTimerAlgorithm() {
             console.log(`INFO: Video start time set to <${video.currentTime}>.`);
         }
 
-        setPermanetTimerAlgorithm();
+        setPermanentTimerAlgorithm();
     }, { once: true });
 
     console.log(`INFO: Temporary video progress listener set.`);
 }
 
-function setPermanetTimerAlgorithm() {
+function setPermanentTimerAlgorithm() {
     let video = document.querySelector("iframe + pjsdiv video");
 
     video.addEventListener("timeupdate", e => {
@@ -782,7 +782,19 @@ function setPermanetTimerAlgorithm() {
         }
     });
 
-    console.log(`INFO: Permanet video progress listener set.`);
+    video.addEventListener("ended", e => {
+        let settings = getSettings();
+
+        if (settings.nextEpisode !== null) {
+            console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
+
+            window.open(settings.nextEpisode, "_top");
+        } else {
+            console.log(`INFO: No next episode for <${settings.name}>.`);
+        }
+    });
+
+    console.log(`INFO: Permanent video progress listener set.`);
 }
 
 function showTimer() {
@@ -821,7 +833,7 @@ function createTimer() {
     return timer;
 }
 
-//Settigs pattern
+//Settings pattern
 function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, refresh) {
     this.name = name;
     this.prevEpisode = prevEpisode;
@@ -833,10 +845,10 @@ function Settings(name, prevEpisode, nextEpisode, startTime, endTime, warnTime, 
 }
 
 function toTimeFormat() {
-    var sec_num = parseInt(this, 10);
-    var hours = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num % 60;
+    let sec_num = parseInt(this, 10);
+    let hours = Math.floor(sec_num / 3600);
+    let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    let seconds = sec_num % 60;
 
     if (hours < 10) { hours = "0" + hours; }
     if (minutes < 10) { minutes = "0" + minutes; }

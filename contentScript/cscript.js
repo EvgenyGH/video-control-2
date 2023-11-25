@@ -78,8 +78,8 @@ function insertShortPanCSS() {
     sheet.insertRule(`#short_control_panel {
                               box-sizing: border-box;
                               position: absolute;
-                              right: 60%;
-                              bottom: 75%;
+                              right: -60%;
+                              top: 12%;
                               color: Chartreuse;
                               text-align: center;
                               line-height: 1.6;
@@ -107,11 +107,11 @@ function insertShortPanCSS() {
     }`);
 
     sheet.insertRule(`.short_refresh {
-                              width: 6em;  
+                              width: 7em;  
     }`);
 
     sheet.insertRule(`.short_prev_episode {
-                              width: 10em;
+                              width: 11em;
     }`);
 
     console.log("INFO: Short CSS inserted.");

@@ -13,8 +13,8 @@
 }
 
 function amediaExec() {
-    const firstEl = document.querySelector(".playlist-episodes > a:nth-of-type(1)");
-    const secondEl = document.querySelector(".playlist-episodes > a:nth-of-type(2)");
+    const firstEl = document.querySelector("#elementb > a:nth-of-type(1)");
+    const secondEl = document.querySelector("#elementb > a:nth-of-type(2)");
 
     if (secondEl) {
         if (getTitle(secondEl) === "Следующая") {
@@ -32,7 +32,7 @@ function amediaExec() {
 function handlePageData(firstEl, secondEl) {
     refreshCheck(secondEl);
 
-    const src = document.querySelector(".players-section iframe").src;
+    const src = document.querySelector(".player_blok .frame_video_mod").src;
 
     if (/.*\.jpg$/.test(src)) {
         showShortPanel(firstEl);
@@ -49,7 +49,7 @@ function showShortPanel(firstEl) {
 }
 
 function scrollToPlayer() {
-    let container = document.querySelector(".players-section .box.visible");
+    let container = document.querySelector(".player_blok .frame_video_mod");
     container.scrollIntoView();
 
     console.log("INFO: Player in view.");
@@ -78,8 +78,8 @@ function insertShortPanCSS() {
     sheet.insertRule(`#short_control_panel {
                               box-sizing: border-box;
                               position: absolute;
-                              right: 6%;
-                              top: 12%;
+                              right: 60%;
+                              bottom: 75%;
                               color: Chartreuse;
                               text-align: center;
                               line-height: 1.6;
@@ -140,7 +140,7 @@ function addShortPanListeners(firstEl) {
 }
 
 function createShortPan() {
-    let container = document.querySelector(".players-section .box.visible");
+    let container = document.querySelector(".video-inside");
     let controlPanel = document.createElement("div");
     let refresh = document.createElement("div");
     let prevEpisode = document.createElement("div");
@@ -188,13 +188,15 @@ function setMessageListener(prev, next) {
 }
 
 function getVideoName() {
-    let name = document.querySelector(".titlesp + a")?.text;
 
-    if (!name) {
-        name = document.querySelector(".film-wr h1").textContent;
+	if (document.querySelector(".pmovie__header h1 a")) {
+        var name = document.querySelector(".pmovie__header h1 a").textContent;
+        name = /«(?<name>.*)»/.exec(name).groups["name"];
+    } else if (document.querySelector(".pmovie__header h1")) {
+    	var name = document.querySelector(".pmovie__header h1").textContent;
         name = /«(?<name>.*)»/.exec(name).groups["name"];
     }
-
+        
     return name;
 }
 

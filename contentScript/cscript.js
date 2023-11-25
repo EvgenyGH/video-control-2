@@ -82,7 +82,7 @@ function insertShortPanCSS() {
                               top: 12%;
                               color: Chartreuse;
                               text-align: center;
-                              line-height: 1.6;
+                              line-height: 1.5;
                               display: flex;
                               gap: 2% 2%;
                               padding: 1%;

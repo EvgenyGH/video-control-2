@@ -7,7 +7,7 @@
             amediaExec();
             break;
         case "mangavost.org":
-            mangavostExecPartOne();
+            setTimeout(mangavostExecPartOne, 500);
             break;
     }
 }

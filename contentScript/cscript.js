@@ -13,20 +13,19 @@
 }
 
 function amediaExec() {
-    const firstEl = document.querySelector("#elementb > a:nth-of-type(1)");
-    const secondEl = document.querySelector("#elementb > a:nth-of-type(2)");
+    const activeEl = document.querySelector("#elementb > .sel-active");
+    let firstEl = activeEl.previousElementSibling;
+    let secondEl = activeEl.nextElementSibling;
 
-    if (secondEl) {
-        if (getTitle(secondEl) === "Следующая") {
-            handlePageData(firstEl, secondEl);
-        } else if (getTitle(firstEl) === "Предыдущая") {
-            handlePageData(firstEl, null);
-        } else {
-            handlePageData(null, secondEl);
-        }
-    } else {
-        handlePageData(null, null);
+    if (!firstEl || firstEl.display === "none" || firstEl.nodeName.toLowerCase() !== "a") {
+        firstEl = null;
     }
+
+    if (!secondEl || secondEl.display === "none" || secondEl.nodeName.toLowerCase() !== "a") {
+        secondEl = null;
+    }
+
+    handlePageData(firstEl, secondEl);
 }
 
 function handlePageData(firstEl, secondEl) {

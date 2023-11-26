@@ -19,12 +19,28 @@ function amediaExec() {
 
     refreshCheck(secondEl);
 
-    const src = document.querySelector(".player_blok .frame_video_mod").src;
+    setMessageListener();
 
-    if (/.*\.jpg$/.test(src)) {
+    manageShortPanel(firstEl);
+}
+
+function manageShortPanel(firstEl) {
+    const videoFrameNode = document.querySelector(".player_blok .frame_video_mod");
+
+    setMutationObserver(firstEl, videoFrameNode);
+    setUpShortPanel(firstEl, videoFrameNode);
+}
+
+function setMutationObserver(firstEl, target) {
+    const observer = new MutationObserver(() => {
+        setUpShortPanel(firstEl, target);
+    });
+    observer.observe(target, { attributeFilter: ["src"] });
+}
+
+function setUpShortPanel(firstEl, videoFrameNode) {
+    if (/.*\.jpg$/.test(videoFrameNode.src)) {
         showShortPanel(firstEl);
-    } else {
-        setMessageListener();
     }
 }
 
@@ -32,6 +48,8 @@ function definePrevNextEpisodes() {
     const activeEl = document.querySelector("#elementb > .sel-active");
     const firstEl = validatePrevNextElement(activeEl.previousElementSibling);
     const secondEl = validatePrevNextElement(activeEl.nextElementSibling);
+
+    console.log(`INFO: Episodes defined. Links to: previous:<${firstEl?.href}> next:<${secondEl?.href}>.`);
 
     return [firstEl, secondEl];
 }
@@ -49,6 +67,16 @@ function showShortPanel(firstEl) {
     insertShortPanCSS();
     addShortPanListeners(firstEl);
     scrollToPlayer();
+}
+
+function removeShortPanel() {
+    let controlPanel = document.querySelector("#short_control_panel");
+
+    if (controlPanel) {
+        controlPanel.remove();
+
+        console.log("INFO: Short control panel removed.");
+    }
 }
 
 function scrollToPlayer() {
@@ -173,8 +201,9 @@ function setMessageListener() {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
-            const name = getVideoName();
 
+            removeShortPanel();
+            const name = getVideoName();
             const episodes = definePrevNextEpisodes();
 
             msg.source.postMessage({

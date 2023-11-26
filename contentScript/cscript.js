@@ -109,14 +109,15 @@ function insertShortPanCSS() {
     sheet.insertRule(`#short_control_panel {
                               box-sizing: border-box;
                               position: absolute;
-                              right: -60%;
-                              top: 12%;
+                              right: 2%;
+                              top: 15%;
                               color: Chartreuse;
                               text-align: center;
                               line-height: 1.5;
                               display: flex;
                               gap: 2% 2%;
                               padding: 1%;
+                              justify-content: end;
     }`);
 
     sheet.insertRule(`.short_refresh,
@@ -316,10 +317,13 @@ function setupMessageExchange() {
 
     console.log(`INFO: Listener set.`);
 
-    setTimeout(() => {
-    	window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
-		console.log(`INFO: Message sent. Request <get_video_data>.`);
-		}, 500);
+    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
+
+    console.log(`INFO: Message sent. Request <get_video_data>.`);
+    // setTimeout(() => {
+    // 	window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
+	// 	console.log(`INFO: Message sent. Request <get_video_data>.`);
+	// 	}, 500);
 }
 
 function updateEndTime(endTime) {

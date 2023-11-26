@@ -13,22 +13,10 @@
 }
 
 function amediaExec() {
-    const activeEl = document.querySelector("#elementb > .sel-active");
-    let firstEl = activeEl.previousElementSibling;
-    let secondEl = activeEl.nextElementSibling;
+    const elements = definePrevNextEpisodes();
+    const firstEl = elements[0];
+    const secondEl = elements[1];
 
-    if (!firstEl || firstEl.display === "none" || firstEl.nodeName.toLowerCase() !== "a") {
-        firstEl = null;
-    }
-
-    if (!secondEl || secondEl.display === "none" || secondEl.nodeName.toLowerCase() !== "a") {
-        secondEl = null;
-    }
-
-    handlePageData(firstEl, secondEl);
-}
-
-function handlePageData(firstEl, secondEl) {
     refreshCheck(secondEl);
 
     const src = document.querySelector(".player_blok .frame_video_mod").src;
@@ -36,8 +24,24 @@ function handlePageData(firstEl, secondEl) {
     if (/.*\.jpg$/.test(src)) {
         showShortPanel(firstEl);
     } else {
-        setMessageListener(firstEl?.href ?? null, secondEl?.href ?? null);
+        setMessageListener();
     }
+}
+
+function definePrevNextEpisodes() {
+    const activeEl = document.querySelector("#elementb > .sel-active");
+    const firstEl = validatePrevNextElement(activeEl.previousElementSibling);
+    const secondEl = validatePrevNextElement(activeEl.nextElementSibling);
+
+    return [firstEl, secondEl];
+}
+
+function validatePrevNextElement(element) {
+    if (!element || element.display === "none" || element.nodeName.toLowerCase() !== "a") {
+        element = null;
+    }
+
+    return element;
 }
 
 function showShortPanel(firstEl) {
@@ -165,17 +169,19 @@ function getTitle(element) {
     return /^(?<title>[А-Яа-я]+)\s\d+\s[А-Яа-я]+/.exec(element.textContent)?.groups.title;
 }
 
-function setMessageListener(prev, next) {
+function setMessageListener() {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
             const name = getVideoName();
 
+            const episodes = definePrevNextEpisodes();
+
             msg.source.postMessage({
                 request: "post_video_data",
                 name: name,
-                previousEpisode: prev,
-                nextEpisode: next
+                previousEpisode: episodes[0]?.href ?? null,
+                nextEpisode: episodes[1]?.href ?? null
             },
                 msg.origin);
 
@@ -187,7 +193,6 @@ function setMessageListener(prev, next) {
 }
 
 function getVideoName() {
-
 	if (document.querySelector(".pmovie__header h1 a")) {
         var name = document.querySelector(".pmovie__header h1 a").textContent;
         name = /«(?<name>.*)»/.exec(name).groups["name"];

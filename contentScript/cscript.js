@@ -808,6 +808,8 @@ function setPermanentTimerAlgorithm() {
                 if (!video.paused) {
                     console.log(`INFO: Opening url=<${settings.nextEpisode}>.`);
 
+                    video.pause();
+
                     window.open(settings.nextEpisode, "_top");
                 } else {
                     console.log(`INFO: Video is paused. Next episode link not opening.`);

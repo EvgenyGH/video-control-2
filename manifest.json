@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "matches": [ "https://amedia.online/*.html", "https://mangavost.org/*" ],
+      "matches": [ "https://mangavost.org/*", "https://amedia.site/*.html" ],
       "js": [ "contentScript/cscript.js" ],
       "match_about_blank": false,
       "all_frames": true,

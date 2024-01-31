@@ -15,7 +15,7 @@
         case "rutube.ru":
             setTimeout(mangavostExecPartOne, 500, "#app > div > div > video",
                 "button[data-testid='ui-fullscreen']",
-                "#raichuVideoPoster");
+                ".raichu-wrapper-module__advertWrapper___eZFz7");
             break;
     }
 }
@@ -339,16 +339,18 @@ function updateEndTime(endTime) {
 }
 
 async function disableAd(extraCssSelector) {
-    let interval = setInterval(function (cssSelector) {
-        let element = document.querySelector(cssSelector);
-        if (element !== null) {
-            document.querySelector(extraCssSelector).remove();
-            clearInterval(interval);
-            console.log("INFO: AD disabled.");
-        }
-    },
-        100,
-        extraCssSelector);
+    // let interval = setInterval(function (cssSelector) {
+    //     let element = document.querySelector(cssSelector);
+    //     if (element !== null) {
+    //         document.querySelector(extraCssSelector).remove();
+    //         clearInterval(interval);
+    //         console.log("INFO: AD disabled.");
+    //     }
+    // },
+    //     100,
+    //     extraCssSelector);
+    document.querySelector(extraCssSelector).remove();
+    console.log("INFO: AD disabled.");
 }
 
 async function playVideo(videoCssSelector) {

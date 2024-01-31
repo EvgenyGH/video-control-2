@@ -7,7 +7,15 @@
             amediaExec();
             break;
         case "mangavost.org":
-            setTimeout(mangavostExecPartOne, 500);
+        case "aser.pro":
+            setTimeout(mangavostExecPartOne, 500, "iframe + pjsdiv video",
+                "[id^=oframevideoplayer] > pjsdiv:nth-child(15) > pjsdiv:nth-child(3)",
+                "#video_ad");
+            break;
+        case "rutube.ru":
+            setTimeout(mangavostExecPartOne, 500, "#app > div > div > video",
+                "button[data-testid='ui-fullscreen']",
+                "#raichuVideoPoster");
             break;
     }
 }
@@ -200,7 +208,10 @@ function getTitle(element) {
 
 function setMessageListener() {
     window.addEventListener("message", (msg) => {
-        if (msg.origin.startsWith("https://mangavost.org") && msg.data.request === "get_video_data") {
+        if ((msg.origin.startsWith("https://mangavost.org") ||
+            msg.origin.startsWith("https://aser.pro") ||
+            msg.origin.startsWith("https://rutube.ru")) &&
+            msg.data.request === "get_video_data") {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>.`);
 
             removeShortPanel();
@@ -234,37 +245,35 @@ function getVideoName() {
     return name;
 }
 
-function mangavostExecPartOne() {
-    setupVideoControls();
-    addFullscreenListener();
-    disableAd();
-    setupMessageExchange();
+function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelector, extraCssSelector) {
+    setupVideoControls(videoCssSelector);
+    addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector);
+    disableAd(extraCssSelector);
+    setupMessageExchange(videoCssSelector);
 }
 
-function mangavostExecPartTwo() {
-    setupControlPanelListeners();
-    setPlayListeners();
+function mangavostExecPartTwo(videoCssSelector) {
+    setupControlPanelListeners(videoCssSelector);
+    setPlayListeners(videoCssSelector);
 }
 
-function setPlayListeners() {
-    let video = document.querySelector("iframe + pjsdiv video");
+function setPlayListeners(videoCssSelector) {
+    let video = document.querySelector(videoCssSelector);
 
     if (!video?.duration) {
         video.addEventListener("loadedmetadata", e => {
-            playVideo();
+            playVideo(videoCssSelector);
             setTimeout(setTimerAlgorithm, 1000);
         }, { once: true });
     } else {
-        playVideo();
+        playVideo(videoCssSelector);
         setTimeout(setTimerAlgorithm, 1000);
     }
 }
 
-function addFullscreenListener() {
-    let fullscreenButton = document.querySelector("[id^=oframevideoplayer] > \
-                                    pjsdiv:nth-child(15) > pjsdiv:nth-child(3)");
-
-    document.querySelector("iframe + pjsdiv video").addEventListener("click", e => {
+function addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector) {
+    document.querySelector(videoCssSelector).addEventListener("click", e => {
+        let fullscreenButton = document.querySelector(fullscreenButtonCssSelector);
         e.preventDefault();
         e.stopPropagation();
         fullscreenButton.click();
@@ -275,7 +284,7 @@ function addFullscreenListener() {
     console.log("INFO: Fullscreen on any key listener set.");
 }
 
-function setupMessageExchange() {
+function setupMessageExchange(videoCssSelector) {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://amedia.site") &&
             msg.data.request === "post_video_data" &&
@@ -283,10 +292,10 @@ function setupMessageExchange() {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
 
             let settings = localStorage.getItem(msg.data.name);
-            let video = document.querySelector("iframe + pjsdiv video");
+            let video = document.querySelector(videoCssSelector);
 
             if (settings === null) {
-                settings = new Settings(msg.data.name, null, null, 0, Math.floor(video.duration), 5, false);
+                settings = new Settings(msg.data.name, null, null, 0, Math.floor(video.duration), 20, false);
 
                 video.addEventListener("loadedmetadata", (e) => {
                     settings.endTime = Math.floor(video.duration);
@@ -311,7 +320,7 @@ function setupMessageExchange() {
 
             console.log(`INFO: Received message computing finished.`);
 
-            mangavostExecPartTwo();
+            mangavostExecPartTwo(videoCssSelector);
         }
     });
 
@@ -320,10 +329,6 @@ function setupMessageExchange() {
     window.parent.postMessage({ request: "get_video_data" }, "https://amedia.site/*");
 
     console.log(`INFO: Message sent. Request <get_video_data>.`);
-    // setTimeout(() => {
-    // 	window.parent.postMessage({ request: "get_video_data" }, "https://amedia.online/*");
-	// 	console.log(`INFO: Message sent. Request <get_video_data>.`);
-	// 	}, 500);
 }
 
 function updateEndTime(endTime) {
@@ -333,14 +338,22 @@ function updateEndTime(endTime) {
     console.log("INFO: End time value on control panel updated.");
 }
 
-async function disableAd() {
-    document.querySelector("#video_ad").remove();
-    console.log("INFO: AD disabled.");
+async function disableAd(extraCssSelector) {
+    let interval = setInterval(function (cssSelector) {
+        let element = document.querySelector(cssSelector);
+        if (element !== null) {
+            document.querySelector(extraCssSelector).remove();
+            clearInterval(interval);
+            console.log("INFO: AD disabled.");
+        }
+    },
+        100,
+        extraCssSelector);
 }
 
-async function playVideo() {
+async function playVideo(videoCssSelector) {
     let autoplay = navigator.getAutoplayPolicy("mediaelement");
-    let video = document.querySelector("iframe + pjsdiv video");
+    let video = document.querySelector(videoCssSelector);
 
     if (["allowed-muted", "allowed"].includes(autoplay)) {
         if (autoplay === "allowed-muted") {
@@ -357,13 +370,13 @@ async function playVideo() {
     }
 }
 
-function setupVideoControls() {
-    createVideoControls();
+function setupVideoControls(videoCssSelector) {
+    createVideoControls(videoCssSelector);
     injectCSS();
-    setupToolbarListeners();
+    setupToolbarListeners(videoCssSelector);
 }
 
-function createVideoControls() {
+function createVideoControls(videoCssSelector) {
     let buttons = {};
     let controls;
     let avcContainer;
@@ -389,7 +402,7 @@ function createVideoControls() {
 
     timer = createTimer();
 
-    document.querySelector("iframe + pjsdiv video").parentElement.append(avcContainer);
+    document.querySelector(videoCssSelector).parentElement.append(avcContainer);
     avcContainer.append(controls);
     avcContainer.append(timer);
 
@@ -561,14 +574,14 @@ function injectCSS() {
 }
 
 //toolbar listener set in setupVideoControls (not redefined)
-function setupControlPanelListeners() {
+function setupControlPanelListeners(videoCssSelector) {
     setupRefreshEpisodeListener();
     setupPreviousEpisodeListener();
     setupNextEpisodeListener();
 
-    setupEpisodeTimeListeners("start");
-    setupEpisodeTimeListeners("warn", 5);
-    setupEpisodeTimeListeners("end");
+    setupEpisodeTimeListeners(videoCssSelector, "start");
+    setupEpisodeTimeListeners(videoCssSelector, "warn", 20);
+    setupEpisodeTimeListeners(videoCssSelector, "end");
 
     setupTimerListener();
 
@@ -580,9 +593,9 @@ function setTitle(name) {
         .setAttribute("title", name);
 }
 
-function setupToolbarListeners() {
+function setupToolbarListeners(videoCssSelector) {
     let toolbar = document.querySelector("#avc_container .controls_toolbar");
-    let video = document.querySelector("iframe + pjsdiv video");
+    let video = document.querySelector(videoCssSelector);
 
     toolbar.addEventListener("click", e => e.stopPropagation());
 
@@ -675,14 +688,14 @@ function setupNextEpisodeListener() {
     console.log("INFO: Next episode listener set.");
 }
 
-function setupEpisodeTimeListeners(name, defaultValue = null) {
+function setupEpisodeTimeListeners(videoCssSelector, name, defaultValue = null) {
     let timeElement = document.querySelector(`#${name}_time_data`);
     timeElement.value = getSettings()[`${name}Time`];
     timeElement.parentElement.title = parseInt(timeElement.value).toTimeFormat();
 
     console.log(`INFO: ${name.charAt(0).toUpperCase() + name.slice(1)} time set`);
 
-    let video = document.querySelector("iframe + pjsdiv video");
+    let video = document.querySelector(videoCssSelector);
     let plusElement = document.querySelector(`#${name}_time_container .plus`);
     let minusElement = document.querySelector(`#${name}_time_container .minus`);
     let setCurrentElement = document.querySelector(`#${name}_time_container .set_current`);
@@ -731,7 +744,7 @@ function setupEpisodeTimeListeners(name, defaultValue = null) {
     console.log(`INFO: Episode ${name} time listener set.`);
 }
 
-function setupTimerListener() {
+function setupTimerListener(videoCssSelector) {
     let timer = document.querySelector("#avc_container .timer");
 
     timer.addEventListener("click", (e) => {
@@ -741,7 +754,7 @@ function setupTimerListener() {
         endTimeElement.value = Number(endTimeElement.value) + 10;
         endTimeElement.dispatchEvent(new Event("input"));
 
-        let video = document.querySelector("iframe + pjsdiv video");
+        let video = document.querySelector(videoCssSelector);
         video.dispatchEvent(new Event("timeupdate"));
 
         console.log(`INFO: Video End time timer prolonged (+10 sec.).`);

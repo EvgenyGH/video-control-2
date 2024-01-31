@@ -9,7 +9,8 @@
   },
   "content_scripts": [
     {
-      "matches": [ "https://mangavost.org/*", "https://amedia.site/*.html" ],
+      "matches": [ "https://mangavost.org/*", "https://amedia.site/*.html",
+        "https://aser.pro/*", "https://rutube.ru/*" ],
       "js": [ "contentScript/cscript.js" ],
       "match_about_blank": false,
       "all_frames": true,

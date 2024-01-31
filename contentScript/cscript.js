@@ -30,6 +30,8 @@ function amediaExec() {
     setMessageListener();
 
     manageShortPanel(firstEl);
+
+    scrollToPlayer();//todo
 }
 
 function manageShortPanel(firstEl) {
@@ -339,21 +341,12 @@ function updateEndTime(endTime) {
 }
 
 async function disableAd(extraCssSelector) {
-    // let interval = setInterval(function (cssSelector) {
-    //     let element = document.querySelector(cssSelector);
-    //     if (element !== null) {
-    //         document.querySelector(extraCssSelector).remove();
-    //         clearInterval(interval);
-    //         console.log("INFO: AD disabled.");
-    //     }
-    // },
-    //     100,
-    //     extraCssSelector);
     document.querySelector(extraCssSelector).remove();
     console.log("INFO: AD disabled.");
 }
 
 async function playVideo(videoCssSelector) {
+    console.log("DEBUG: Play video Called!!!");
     let autoplay = navigator.getAutoplayPolicy("mediaelement");
     let video = document.querySelector(videoCssSelector);
 
@@ -363,7 +356,6 @@ async function playVideo(videoCssSelector) {
             console.log("INFO: Autoplay video allowed muted.");
         }
 
-        video.scrollIntoView();
         video.play();
 
         console.log("INFO: Video.play().");

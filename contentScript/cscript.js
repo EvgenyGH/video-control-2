@@ -263,11 +263,11 @@ function setPlayListeners(videoCssSelector) {
     if (!video?.duration) {
         video.addEventListener("loadedmetadata", e => {
             playVideo(videoCssSelector);
-            setTimeout(setTimerAlgorithm, 1000);
+            setTimeout(setTimerAlgorithm, 1000, videoCssSelector);
         }, { once: true });
     } else {
         playVideo(videoCssSelector);
-        setTimeout(setTimerAlgorithm, 1000);
+        setTimeout(setTimerAlgorithm, 1000, videoCssSelector);
     }
 }
 
@@ -781,8 +781,8 @@ function saveSettings(settings) {
     console.log(`INFO: Data saved. Data <${JSON.stringify(settings)}>.`);
 }
 
-function setTimerAlgorithm() {
-    let video = document.querySelector("iframe + pjsdiv video");
+function setTimerAlgorithm(videoCssSelector) {
+    let video = document.querySelector(videoCssSelector);
 
     video.addEventListener("timeupdate", e => {
         let videoCurrentTime = parseInt(video.currentTime);
@@ -798,14 +798,14 @@ function setTimerAlgorithm() {
             console.log(`INFO: Video start time set to <${video.currentTime}>.`);
         }
 
-        setPermanentTimerAlgorithm();
+        setPermanentTimerAlgorithm(videoCssSelector);
     }, { once: true });
 
     console.log(`INFO: Temporary video progress listener set.`);
 }
 
-function setPermanentTimerAlgorithm() {
-    let video = document.querySelector("iframe + pjsdiv video");
+function setPermanentTimerAlgorithm(videoCssSelector) {
+    let video = document.querySelector(videoCssSelector);
 
     video.addEventListener("timeupdate", e => {
         let videoCurrentTime = parseInt(video.currentTime);

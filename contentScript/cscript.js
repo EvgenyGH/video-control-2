@@ -8,14 +8,18 @@
             break;
         case "mangavost.org":
         case "aser.pro":
-            setTimeout(mangavostExecPartOne, 500, "iframe + pjsdiv video",
+            setTimeout(mangavostExecPartOne, 500,
+                "iframe + pjsdiv video",
                 "[id^=oframevideoplayer] > pjsdiv:nth-child(15) > pjsdiv:nth-child(3)",
-                "#video_ad");
+                "#video_ad",
+                null);
             break;
         case "rutube.ru":
-            setTimeout(mangavostExecPartOne, 500, "#app > div > div > video",
+            setTimeout(mangavostExecPartOne, 500,
+                "#app > div > div > video",
                 "button[data-testid='ui-fullscreen']",
-                ".raichu-wrapper-module__advertWrapper___eZFz7");
+                ".raichu-wrapper-module__advertWrapper___eZFz7",
+                "button[data-testid='ui-play']");
             break;
     }
 }
@@ -31,7 +35,7 @@ function amediaExec() {
 
     manageShortPanel(firstEl);
 
-    scrollToPlayer();//todo
+    scrollToPlayer();
 }
 
 function manageShortPanel(firstEl) {
@@ -247,28 +251,29 @@ function getVideoName() {
     return name;
 }
 
-function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelector, extraCssSelector) {
+function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelector,
+                              extraCssSelector, playElementCssSelector) {
     setupVideoControls(videoCssSelector);
     addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector);
-    disableAd(extraCssSelector);
-    setupMessageExchange(videoCssSelector);
+    disableAd(extraCssSelector, videoCssSelector);
+    setupMessageExchange(videoCssSelector, playElementCssSelector);
 }
 
-function mangavostExecPartTwo(videoCssSelector) {
+function mangavostExecPartTwo(videoCssSelector, playElementCssSelector) {
     setupControlPanelListeners(videoCssSelector);
-    setPlayListeners(videoCssSelector);
+    setPlayListeners(videoCssSelector, playElementCssSelector);
 }
 
-function setPlayListeners(videoCssSelector) {
+function setPlayListeners(videoCssSelector, playElementCssSelector) {
     let video = document.querySelector(videoCssSelector);
 
     if (!video?.duration) {
         video.addEventListener("loadedmetadata", e => {
-            playVideo(videoCssSelector);
+            playVideo(videoCssSelector, playElementCssSelector);
             setTimeout(setTimerAlgorithm, 1000, videoCssSelector);
         }, { once: true });
     } else {
-        playVideo(videoCssSelector);
+        playVideo(videoCssSelector, playElementCssSelector);
         setTimeout(setTimerAlgorithm, 1000, videoCssSelector);
     }
 }
@@ -286,7 +291,7 @@ function addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector) {
     console.log("INFO: Fullscreen on any key listener set.");
 }
 
-function setupMessageExchange(videoCssSelector) {
+function setupMessageExchange(videoCssSelector, playElementCssSelector) {
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith("https://amedia.site") &&
             msg.data.request === "post_video_data" &&
@@ -322,7 +327,7 @@ function setupMessageExchange(videoCssSelector) {
 
             console.log(`INFO: Received message computing finished.`);
 
-            mangavostExecPartTwo(videoCssSelector);
+            mangavostExecPartTwo(videoCssSelector, playElementCssSelector);
         }
     });
 
@@ -340,15 +345,15 @@ function updateEndTime(endTime) {
     console.log("INFO: End time value on control panel updated.");
 }
 
-async function disableAd(extraCssSelector) {
+async function disableAd(extraCssSelector, videoCssSelector) {
     document.querySelector(extraCssSelector).remove();
     console.log("INFO: AD disabled.");
 }
 
-async function playVideo(videoCssSelector) {
-    console.log("DEBUG: Play video Called!!!");
+async function playVideo(videoCssSelector, playElementCssSelector) {
     let autoplay = navigator.getAutoplayPolicy("mediaelement");
     let video = document.querySelector(videoCssSelector);
+    let playElement = document.querySelector(playElementCssSelector);
 
     if (["allowed-muted", "allowed"].includes(autoplay)) {
         if (autoplay === "allowed-muted") {
@@ -356,9 +361,16 @@ async function playVideo(videoCssSelector) {
             console.log("INFO: Autoplay video allowed muted.");
         }
 
-        video.play();
+        if (playElementCssSelector === null) {
+            video.play();
 
-        console.log("INFO: Video.play().");
+            console.log("INFO: Video.play().");
+        } else {
+            playElement.click();
+
+            console.log("INFO: playElement.click().");
+        }
+
     } else {
         console.log("INFO: Autoplay failed. Please change Autoplay policy.");
     }

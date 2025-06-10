@@ -3,7 +3,7 @@
     console.log(`INFO: Content script injected to <${title}>.`);
 
     switch (title) {
-        case "amedia.lol":
+        case "amedia.biz":
             amediaExec();
             break;
         case "mangavost.org":
@@ -18,7 +18,7 @@
             setTimeout(mangavostExecPartOne, 500,
                 "#app > div > div > video",
                 "button[data-testid='ui-fullscreen']",
-                ".raichu-wrapper-module__advertWrapper___eZFz7",
+                ".raichu-advert-wrapper-module__advertWrapper___ETIJB",
                 "button[data-testid='ui-play']");
             break;
     }
@@ -293,7 +293,7 @@ function addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector) {
 
 function setupMessageExchange(videoCssSelector, playElementCssSelector) {
     window.addEventListener("message", (msg) => {
-        if (msg.origin.startsWith("https://amedia.lol") &&
+        if (msg.origin.startsWith("https://amedia.biz") &&
             msg.data.request === "post_video_data" &&
             msg.data?.name !== undefined) {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
@@ -333,7 +333,7 @@ function setupMessageExchange(videoCssSelector, playElementCssSelector) {
 
     console.log(`INFO: Listener set.`);
 
-    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.lol/*");
+    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.biz/*");
 
     console.log(`INFO: Message sent. Request <get_video_data>.`);
 }
@@ -353,7 +353,6 @@ async function disableAd(extraCssSelector, videoCssSelector) {
 async function playVideo(videoCssSelector, playElementCssSelector) {
     let autoplay = navigator.getAutoplayPolicy("mediaelement");
     let video = document.querySelector(videoCssSelector);
-    let playElement = document.querySelector(playElementCssSelector);
 
     if (["allowed-muted", "allowed"].includes(autoplay)) {
         if (autoplay === "allowed-muted") {
@@ -366,13 +365,37 @@ async function playVideo(videoCssSelector, playElementCssSelector) {
 
             console.log("INFO: Video.play().");
         } else {
-            playElement.click();
+            clickPlayButton(playElementCssSelector);
 
-            console.log("INFO: playElement.click().");
+            console.log("INFO: try to click playElement.");
         }
 
     } else {
         console.log("INFO: Autoplay failed. Please change Autoplay policy.");
+    }
+}
+
+async function clickPlayButton(playElementCssSelector) {
+    let playElement = document.querySelector(playElementCssSelector);
+
+    for (let i = 1; i <= 5; i++) {
+        if (playElement === null) {
+            console.log(`INFO: playElement is null. Waiting 500ms. ${i} time.`);
+
+            await new Promise(r => setTimeout(r, 500));
+            playElement = document.querySelector(playElementCssSelector);
+
+        } else {
+            playElement.click();
+
+            console.log("INFO: playElement.click().");
+
+            break;
+        }
+    }
+
+    if (playElement === null) {
+        console.warn("INFO: playElement is null. Execution currupted.");
     }
 }
 

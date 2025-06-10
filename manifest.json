@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.6.2",
+  "version": "1.0.0",
   "name": "Anime video control",
   "short_name": "AVC",
   "description": "Anime video control for animedia",
@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "matches": [ "https://mangavost.org/*", "https://amedia.lol/*.html",
+      "matches": [ "https://mangavost.org/*", "https://amedia.biz/*.html",
         "https://aser.pro/*", "https://rutube.ru/*" ],
       "js": [ "contentScript/cscript.js" ],
       "match_about_blank": false,

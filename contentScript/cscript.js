@@ -251,9 +251,9 @@ function getVideoName() {
     return name;
 }
 
-function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelector,
+async function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelector,
                               extraCssSelector, playElementCssSelector) {
-    setupVideoControls(videoCssSelector);
+    await setupVideoControls(videoCssSelector);
     addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector);
     disableAd(extraCssSelector, videoCssSelector);
     setupMessageExchange(videoCssSelector, playElementCssSelector);
@@ -399,13 +399,13 @@ async function clickPlayButton(playElementCssSelector) {
     }
 }
 
-function setupVideoControls(videoCssSelector) {
-    createVideoControls(videoCssSelector);
+async function setupVideoControls(videoCssSelector) {
+    await createVideoControls(videoCssSelector);
     injectCSS();
     setupToolbarListeners(videoCssSelector);
 }
 
-function createVideoControls(videoCssSelector) {
+async function createVideoControls(videoCssSelector) {
     let buttons = {};
     let controls;
     let avcContainer;
@@ -431,7 +431,20 @@ function createVideoControls(videoCssSelector) {
 
     timer = createTimer();
 
-    document.querySelector(videoCssSelector).parentElement.append(avcContainer);
+    for (let i = 1; i <= 5; i++) {
+        if (document.querySelector(videoCssSelector) === null) {
+            console.warn(`INFO: document.querySelector(videoCssSelector).parentElement is null. Waiting to repeat ${i} time.`);
+
+            await new Promise(r => setTimeout(r, 500));
+
+            if (i == 5) {
+                console.warn("WARN: document.querySelector(videoCssSelector).parentElement is null");
+            }
+        } else {
+            document.querySelector(videoCssSelector).parentElement.append(avcContainer);
+        }
+    }
+
     avcContainer.append(controls);
     avcContainer.append(timer);
 

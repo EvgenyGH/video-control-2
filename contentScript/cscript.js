@@ -3,7 +3,7 @@
     console.log(`INFO: Content script injected to <${title}>.`);
 
     switch (title) {
-        case "amedia.biz":
+        case "amedia.so":
             amediaExec();
             break;
         case "mangavost.org":
@@ -293,7 +293,7 @@ function addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector) {
 
 function setupMessageExchange(videoCssSelector, playElementCssSelector) {
     window.addEventListener("message", (msg) => {
-        if (msg.origin.startsWith("https://amedia.biz") &&
+        if (msg.origin.startsWith("https://amedia.so") &&
             msg.data.request === "post_video_data" &&
             msg.data?.name !== undefined) {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
@@ -333,7 +333,7 @@ function setupMessageExchange(videoCssSelector, playElementCssSelector) {
 
     console.log(`INFO: Listener set.`);
 
-    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.biz/*");
+    window.parent.postMessage({ request: "get_video_data" }, "https://amedia.so/*");
 
     console.log(`INFO: Message sent. Request <get_video_data>.`);
 }

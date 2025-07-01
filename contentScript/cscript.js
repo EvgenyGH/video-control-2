@@ -16,9 +16,9 @@
             break;
         case "rutube.ru":
             setTimeout(mangavostExecPartOne, 500,
-                "#app > div > div > div > div > div > video",
+                "#app video",
                 "button[data-testid='ui-fullscreen']",
-                ".raichu-advert-wrapper-module__advertWrapper___ETIJB",
+                "#app #raichu_yasdk_container",
                 "button[data-testid='ui-play']");
             break;
     }
@@ -255,7 +255,7 @@ async function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelecto
                               extraCssSelector, playElementCssSelector) {
     await setupVideoControls(videoCssSelector);
     addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector);
-    disableAd(extraCssSelector, videoCssSelector);
+    disableAd(extraCssSelector);
     setupMessageExchange(videoCssSelector, playElementCssSelector);
 }
 
@@ -345,9 +345,24 @@ function updateEndTime(endTime) {
     console.log("INFO: End time value on control panel updated.");
 }
 
-async function disableAd(extraCssSelector, videoCssSelector) {
-    document.querySelector(extraCssSelector).remove();
-    console.log("INFO: AD disabled.");
+async function disableAd(extraCssSelector) {
+    let adElement = document.querySelector(extraCssSelector);
+
+    for (let i = 1; i <= 20; i++) {
+        if (adElement === null) {
+            console.log(`INFO: adElement is null. Waiting 500ms. ${i} time.`);
+
+            await new Promise(r => setTimeout(r, 100));
+            adElement = document.querySelector(extraCssSelector);
+
+        } else {
+            adElement.remove();
+
+            console.log("INFO: AD disabled.");
+
+            break;
+        }
+    }
 }
 
 async function playVideo(videoCssSelector, playElementCssSelector) {

@@ -16,7 +16,7 @@
             break;
         case "rutube.ru":
             setTimeout(mangavostExecPartOne, 500,
-                "#app > div > div > video",
+                "#app > div > div > div > div > div > video",
                 "button[data-testid='ui-fullscreen']",
                 ".raichu-advert-wrapper-module__advertWrapper___ETIJB",
                 "button[data-testid='ui-play']");
@@ -378,7 +378,7 @@ async function playVideo(videoCssSelector, playElementCssSelector) {
 async function clickPlayButton(playElementCssSelector) {
     let playElement = document.querySelector(playElementCssSelector);
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 20; i++) {
         if (playElement === null) {
             console.log(`INFO: playElement is null. Waiting 500ms. ${i} time.`);
 
@@ -431,13 +431,13 @@ async function createVideoControls(videoCssSelector) {
 
     timer = createTimer();
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 20; i++) {
         if (document.querySelector(videoCssSelector) === null) {
             console.warn(`INFO: document.querySelector(videoCssSelector).parentElement is null. Waiting to repeat ${i} time.`);
 
             await new Promise(r => setTimeout(r, 500));
 
-            if (i == 5) {
+            if (i == 20) {
                 console.warn("WARN: document.querySelector(videoCssSelector).parentElement is null");
             }
         } else {
@@ -510,6 +510,7 @@ function injectCSS() {
             top: 1%;
             font-size: 100%;
             box-sizing: border-box;
+            z-index: 100;
     }`);
 
     sheet.insertRule(`

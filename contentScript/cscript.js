@@ -257,7 +257,7 @@ async function mangavostExecPartOne(videoCssSelector, fullscreenButtonCssSelecto
     await setupVideoControls(videoCssSelector);
     addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector);
     disableAd(extraCssSelector);
-    setupMessageExchange(videoCssSelector, playElementCssSelector);
+    await setupMessageExchange(videoCssSelector, playElementCssSelector);
 }
 
 function mangavostExecPartTwo(videoCssSelector, playElementCssSelector) {
@@ -292,12 +292,15 @@ function addFullscreenListener(videoCssSelector, fullscreenButtonCssSelector) {
     console.log("INFO: Fullscreen on any key listener set.");
 }
 
-function setupMessageExchange(videoCssSelector, playElementCssSelector) {
+async function setupMessageExchange(videoCssSelector, playElementCssSelector) {
+    let responseRecieved = false;
+
     window.addEventListener("message", (msg) => {
         if (msg.origin.startsWith(`https://${AMEDIA}`) &&
             msg.data.request === "post_video_data" &&
             msg.data?.name !== undefined) {
             console.log(`INFO: Message recieved. Request <${msg.data.request}>. Data <${JSON.stringify(msg.data)}>.`);
+            responseRecieved = true;
 
             let settings = localStorage.getItem(msg.data.name);
             let video = document.querySelector(videoCssSelector);
@@ -334,9 +337,21 @@ function setupMessageExchange(videoCssSelector, playElementCssSelector) {
 
     console.log(`INFO: Listener set.`);
 
-    window.parent.postMessage({ request: "get_video_data" }, `https://${AMEDIA}/*`);
+    for (let i = 1; i <= 10; i++) {
+        if (!responseRecieved) {
+            window.parent.postMessage({ request: "get_video_data" }, `https://${AMEDIA}/*`);
 
-    console.log(`INFO: Message sent. Request <get_video_data>.`);
+            console.log(`INFO: Message sent(${i} time). Request <get_video_data>.`);
+
+            await new Promise(r => setTimeout(r, 500));
+        } else {
+            break;
+        }
+
+        if (i === 10) {
+            console.warn(`WARN: Message sent failed. Request <get_video_data>.`);
+        }
+    }
 }
 
 function updateEndTime(endTime) {

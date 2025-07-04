@@ -1,4 +1,4 @@
-﻿const AMEDIA = "www.amedia.so";
+﻿const AMEDIA = "animeta.me";
 function main() {
     const title = /https:\/\/(?<title>.*?)\/.*?/.exec(window.location).groups["title"];
     console.log(`INFO: Content script injected to <${title}>.`);

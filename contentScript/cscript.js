@@ -1,4 +1,4 @@
-﻿const AMEDIA = "amedia.online";
+﻿const AMEDIA = "amd.online";
 
 function main() {
     const title = /https:\/\/(?<title>.*?)\/.*?/.exec(window.location).groups["title"];
